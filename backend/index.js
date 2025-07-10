@@ -21,5 +21,5 @@ app.use("/api/auth", authRouter);
 app.use('/api/notes', notesRouter);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`)
+  console.log(`uNote App listening on port http://localhost:${port}`)
 })
