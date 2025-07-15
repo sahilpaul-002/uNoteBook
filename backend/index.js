@@ -1,5 +1,6 @@
 import { connectToMongoDB } from "./db.js";
 import express from 'express';
+import cors from 'cors';
 import { router as authRouter }  from "./routes/auth.js";
 import { router as notesRouter} from "./routes/notes.js";
 
@@ -9,6 +10,9 @@ const client = connectToMongoDB();
 // Initialize Express app
 const app = express()
 const port = 5000
+
+// Enable cors
+app.use(cors())
 
 // Middleware to parse JSON bodies
 app.use(express.json());

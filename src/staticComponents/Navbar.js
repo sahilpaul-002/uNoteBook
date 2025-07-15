@@ -54,8 +54,12 @@ export default function Navbar() {
               <button className="btn btn-outline-success" type="submit">Search</button>
             </form>
 
+            {/*   Login / Sign up   */}
+            {/* <Link className={`nav-link ${location.pathname==="/signup"?"active":""} ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-3"}`} aria-current="page" to="/signup">Sign Up</Link> */}
+            <Link className={`${location.pathname==="/signup"?"link-dark":"link-secondary"} link-offset-2 link-underline link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-3"}`} aria-current="page" to="/signup">Sign Up</Link>
+
             {/*   Theme toggle button   */}
-            <div className={`form-check form-switch ${theme === "light" ? "form-check-reverse" : ""} ${isCollapsed ? "float-start my-2" : "mx-2"}`}>
+            <div className={`form-check form-switch ${theme === "light" ? "form-check-reverse" : ""} ${isCollapsed ? "float-start my-2 mx-2" : "ms-1 me-2"}`}>
               <input className="form-check-input" type="checkbox" role="switch"
                 id={`${theme === "light" ? "switchCheckReverse" : "switchCheckChecked"}`} onClick={() => { toggleTheme(theme); handleThemeAlert() }} />
               <label className="form-check-label" htmlFor={`${theme === "light" ? "switchCheckReverse" : "switchCheckChecked"}`}>

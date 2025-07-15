@@ -2,6 +2,8 @@
 import { createBrowserRouter } from "react-router";
 import App from './App';
 import Home from "./dynamicComponents/Home";
+import SignUp from "./staticComponents/SignUp";
+import Login from "./staticComponents/Login";
 import About from "./staticComponents/About";
 
 const router = createBrowserRouter([
@@ -12,6 +14,14 @@ const router = createBrowserRouter([
             {
                 index: true, // This will render Home component at the root path "/"
                 Component: Home
+            },
+            {
+                path: "signup",
+                Component: SignUp
+            },
+            {
+                path: "login",
+                Component: Login
             },
             {
                 path: "about", // This will render About component at "/about"
