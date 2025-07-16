@@ -2,8 +2,8 @@
 import { createBrowserRouter } from "react-router";
 import App from './App';
 import Home from "./dynamicComponents/Home";
-import SignUp from "./staticComponents/SignUp";
-import Login from "./staticComponents/Login";
+import UserSignUp from "./staticComponents/UserSignUp";
+import UserLogin from "./staticComponents/UserLogin";
 import About from "./staticComponents/About";
 
 const router = createBrowserRouter([
@@ -17,11 +17,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "signup",
-                Component: SignUp
+                Component: UserSignUp
             },
             {
                 path: "login",
-                Component: Login
+                Component: UserLogin
             },
             {
                 path: "about", // This will render About component at "/about"

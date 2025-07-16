@@ -25,6 +25,7 @@ router.post("/",
         body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long'),
     ],
     async (req, res) => {
+        let success = false;
         //Generate a salt for hashing the password
         const salt = await bcrypt.genSalt(10);
         // Hash the password with the generated salt
@@ -48,16 +49,17 @@ router.post("/",
             );
             // Send the user id and token in the response
             res.json({
+                success: true,
                 userId: user._id,
                 authToken: jwtToken
             });
         } catch (e) {
             if (e.array) {
                 // If it's a validation error
-                return res.json({ errors: e.array() });
+                return res.json({ success: false, errors: e.array() });
             }
             // If it's some other error (e.g. DB error)
-            return res.json({ error: e.message });
+            return res.json({ success: false, error: e.message });
         }
     });
 // ********************************************** ---------------- ********************************************** //
@@ -71,6 +73,7 @@ router.post('/login',
         body('password').exists().withMessage('Password is required')
     ],
     async (req, res) => {
+        let success = false;
         // Check for validation errors
         const validationErrors = validationResult(req);
         try {
@@ -100,6 +103,7 @@ router.post('/login',
             );
             // Send the user id and token in the response
             res.json({
+                success: true,
                 userId: user._id,
                 authToken: jwtToken
             });
@@ -107,10 +111,10 @@ router.post('/login',
         } catch (e) {
             if (e.array) {
                 // If it's a validation error
-                return res.json({ errors: e.array() });
+                return res.json({ success: false, errors: e.array() });
             }
             // If it's some other error (e.g. DB error)
-            return res.json({ error: e.message });
+            return res.json({ success: false, error: e.message });
         }
     });
 // ********************************************** ---------------- ********************************************** //
@@ -119,6 +123,7 @@ router.post('/login',
 // ********************************************** User details afeter login logic ********************************************** //
 // Route 1 : Get loggedin user detaisl using POST "/api/auth/getuser" - Login required
 router.post('/getuser', fetchUserDetails, async (req, res) => {
+    let success = false;
     try {
         // Get the user ID from the request object
         const userId = req.user.userId;
@@ -138,10 +143,10 @@ router.post('/getuser', fetchUserDetails, async (req, res) => {
     } catch (e) {
         if (e.array) {
             // If it's a validation error
-            return res.json({ errors: e.array() });
+            return res.json({ success: false, errors: e.array() });
         }
         // If it's some other error (e.g. DB error)
-        return res.json({ error: e.message });
+        return res.json({ success: false, error: e.message });
     }
 });
 

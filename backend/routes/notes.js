@@ -9,13 +9,14 @@ const router = express.Router();
 // ********************************************** Fetch all notes logic ********************************************** //
 // Route 1 : Fetch all notes for a user using GET "/api/notes/fetchallnotes" - Login required
 router.get('/fetchallnotes', fetchUserDetails, async (req, res) => {
+    console.log(req.user);
     try {
         // Check user is logged in
         if (!req.user) {
             throw new Error("User not logged in");
         }
         // Convert the user ID to a MongoDB ObjectId
-        const userId = new mongoose.Types.ObjectId('6865add3849375ea574ec430');
+        const userId = req.user.userId
         // Fetch notes for the user from the database
         const notes = await Note.find({ user: userId });
         res.json(notes);
@@ -69,7 +70,7 @@ router.post('/addnote', fetchUserDetails,
 // ********************************************** ----------------------- ********************************************** //
 
 
-// ********************************************** Add Notes Logic logic ********************************************** //
+// ********************************************** Updates Notes Logic logic ********************************************** //
 // Route 3 : Update an existing note for a user using PUT "/api/notes/updatenote/:id" - Login required
 router.put('/updatenote/:id', fetchUserDetails,
     async (req, res) => {
@@ -119,7 +120,7 @@ router.put('/updatenote/:id', fetchUserDetails,
 // ********************************************** ----------------------- ********************************************** //
 
 
-// ********************************************** Add Notes Logic logic ********************************************** //
+// ********************************************** Delete Notes Logic logic ********************************************** //
 // Route 4 : Delete  an existing note for a user using DELETE "/api/notes/deletenote/:id" - Login required
 router.delete('/deletenote/:id', fetchUserDetails,
     async (req, res) => {
@@ -136,7 +137,7 @@ router.delete('/deletenote/:id', fetchUserDetails,
             }
             // Check if the note belongs to the user
             if (note.user.toString() !== req.user.userId) {
-                return res.status(401).json({error: "Not allowed to update this note"});
+                return res.status(401).json({error: "Not allowed to delete this note"});
             }
             // Delete the note in the database
             const deletedNote = await Note.findByIdAndDelete(noteId);

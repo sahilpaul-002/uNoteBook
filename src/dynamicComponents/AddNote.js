@@ -1,11 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
 import NoteContext from '../contexts/NoteContext';
 import DisableButtonContext from '../contexts/DisableButtonContext';
+import AlertContext from '../contexts/AlertContext';
 
 export default function AddNote() {
     // Destructing context values passed from the parent
     const {addNote, editNote} = useContext(NoteContext)
     const {disableButton, setDisableButton} = useContext(DisableButtonContext);
+    const { showAlert } = useContext(AlertContext);
 
     // State to manage the note
     const [note, setNote] = useState({
@@ -53,6 +55,8 @@ export default function AddNote() {
       e.preventDefault();
 
       editNote(disableButton.editNote._id, note.title, note.description, note.tags);
+
+      showAlert("Note edited successfully !", "success");// Display alert message
       
       setNote({
         title: "", 
@@ -74,7 +78,7 @@ export default function AddNote() {
         <form>
           <div className="mb-3">
             <label htmlFor="title" className="form-label">Title</label>
-            <input type="text" className="form-control" id="title" name="title" placeholder="Enter notes title" value={note.title} aria-describedby="titleHelp" minLength={5} required onChange={handleOnChange}/>
+            <input type="text" className="form-control" id="title" name="title" placeholder="Enter notes title" value={note.title} aria-describedby="titleHelp" minLength={3} required onChange={handleOnChange}/>
           </div>
           <div className="mb-3">
             <label htmlFor="description" className="form-label">Description</label>
@@ -84,8 +88,8 @@ export default function AddNote() {
             <label htmlFor="tags" className="form-label">Tags</label>
             <input type="text" className="form-control" id="tags" name="tags" placeholder="Enter notes tags" value={note.tags} onChange={handleOnChange}/>
           </div>
-          <button type="submit" className="btn btn-outline-success" disabled={disableButton.addButton || note.title.length<5 || note.description.length<5 ? true : false} onClick={handleOnAddClick}>Add Note</button>
-          <button type="submit" className="btn btn-outline-success mx-3" disabled={disableButton.editButton || note.title.length<5 || note.description.length<5 ? true : false} onClick={handleOnEditClick}>Edit Note</button>
+          <button type="submit" className="btn btn-outline-success" disabled={disableButton.addButton || note.title.length<3 || note.description.length<5 ? true : false} onClick={handleOnAddClick}>Add Note</button>
+          <button type="submit" className="btn btn-outline-success mx-3" disabled={disableButton.editButton || note.title.length<3 || note.description.length<5 ? true : false} onClick={handleOnEditClick}>Edit Note</button>
         </form>
       </div>
   )
