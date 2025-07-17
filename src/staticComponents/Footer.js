@@ -6,7 +6,7 @@ export default function Footer() {
     const { theme }  = useContext(ThemeContext);
     
     return (
-        <div className={`card mt-5 pt-2 ${theme==="light"?"bg-warning-subtle":"bg-dark"}`} style={{...(theme==="light"?{color: "black"}:{color: "white"})}}>
+        <div className={`card mt-5 pt-2 ${theme==="light"?"bg-warning-subtle":"bg-black"}`} style={{...(theme==="light"?{color: "black"}:{color: "white"})}}>
             <div className="card-header text-center fw-bold">
                 Stay Informed. Stay Ahead.
             </div>

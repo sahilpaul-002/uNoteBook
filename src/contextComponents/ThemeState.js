@@ -10,7 +10,7 @@ export default function ThemeProvider(props) {
         if (theme === "light") {
             setTheme("dark");
             // Set the document body style
-            document.body.style.backgroundColor = "#343a40"
+            document.body.style.backgroundColor = "#2b2b2bff"
             document.body.style.color = "white";
         }
         else if (theme === "dark") {

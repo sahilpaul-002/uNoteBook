@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, { useContext, useEffect } from 'react';
 import ThemeContext from '../contexts/ThemeContext';
 import NoteContext from '../contexts/NoteContext';
 import DisableButtonContext from '../contexts/DisableButtonContext';
@@ -10,8 +10,8 @@ export default function NoteItem(props) {
 
     // Destructing context values passed from the parent
     const { theme } = useContext(ThemeContext);
-    const {getAllNotes, deleteNote} = useContext(NoteContext)
-    const {setDisableButton} = useContext(DisableButtonContext);
+    const { getAllNotes, deleteNote } = useContext(NoteContext)
+    const { setDisableButton } = useContext(DisableButtonContext);
     const { showAlert } = useContext(AlertContext);
 
     // Function to set the state of disabled buttons
@@ -30,39 +30,52 @@ export default function NoteItem(props) {
     const handleOnDelete = () => {
         // Scroll to the top of the page
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+
         showAlert("Note deleted successfully !", "success");// Display alert message
     }
 
     // UseEffect to load all the notes on page landing
     useEffect(() => {
-        if (localStorage.getItem("loginToken")!==null) {
-            getAllNotes();
+        if (localStorage.getItem("loginToken") !== null) {
+            const fetchNotes = async () => {
+                let response = null;
+                try {
+                    response = await getAllNotes();
+                    if (!response.success) {
+                        console.log(response); // Capture response errors
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Error fetching notes:", error.message); // Capture other than response errors
+                }
+            };
+
+            fetchNotes(); // call the async function
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]);
+    }, []);
 
     return (
         <div>
-            {notes.length===0 ?
+            {notes.length === 0 ?
                 <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
                     <h5>😢 Oops! No notes available. Please add some.</h5>
                 </div> :
                 notes.map((note) => {
-                return (
-                    <div className={`card text-bg-${theme==="dark"?"dark":"light"} mb-3`} key={note._id} style={{ maxWidth: "100%" }}>
-                        <div className="card-header">
-                            <h5>Title: {note.title}</h5>
+                    return (
+                        <div className={`card text-bg-${theme === "dark" ? "dark" : "light"} mb-3`} id={`note-${note._id}`} key={note._id} style={{ maxWidth: "100%" }}>
+                            <div className="card-header">
+                                <h5>Title: {note.title}</h5>
+                            </div>
+                            <div className="card-body" style={{ backgroundColor: 'transparent' }}>
+                                <p className="card-text">{note.description}</p>
+                                <i className="fa-solid fa-file-pen mx-2" onClick={() => { handleOnClick(note) }}></i>
+                                <i className="fa-solid fa-trash mx-2" onClick={() => { deleteNote(note._id); handleOnDelete() }}></i>
+                            </div>
                         </div>
-                        <div className="card-body" style={{backgroundColor: 'transparent'}}>
-                            <p className="card-text">{note.description}</p>
-                            <i className="fa-solid fa-file-pen mx-2" onClick={() => {handleOnClick(note)}}></i>
-                            <i className="fa-solid fa-trash mx-2" onClick={() => {deleteNote(note._id); handleOnDelete()}}></i>
-                        </div>
-                    </div>
-                )
-            })
-            } 
+                    )
+                })
+            }
         </div>
     )
 }

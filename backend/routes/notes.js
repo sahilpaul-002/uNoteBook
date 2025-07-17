@@ -9,7 +9,7 @@ const router = express.Router();
 // ********************************************** Fetch all notes logic ********************************************** //
 // Route 1 : Fetch all notes for a user using GET "/api/notes/fetchallnotes" - Login required
 router.get('/fetchallnotes', fetchUserDetails, async (req, res) => {
-    console.log(req.user);
+    let success = false;
     try {
         // Check user is logged in
         if (!req.user) {
@@ -19,9 +19,9 @@ router.get('/fetchallnotes', fetchUserDetails, async (req, res) => {
         const userId = req.user.userId
         // Fetch notes for the user from the database
         const notes = await Note.find({ user: userId });
-        res.json(notes);
+        res.json({success:true, notes:notes});
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.status(500).json({ success: false, error: e.message });
     }
 
 });
@@ -36,6 +36,7 @@ router.post('/addnote', fetchUserDetails,
         body('description', 'Valid description is required atleast of 5 characters').isLength({ min: 5 }),
     ],
     async (req, res) => {
+        let success = false;
         try {
             // Fetch validation errors
             const validationErrors = validationResult(req);
@@ -55,15 +56,15 @@ router.post('/addnote', fetchUserDetails,
                 tags: req.body.tags
             })
             // Send the created note in the response
-            res.json(note);
+            res.json({success: true, note: note});
 
         } catch (e) {
             // If the validation errors is array
             if (e.array) {
-                return res.json({ errors: e.array() });
+                return res.json({ success: false, errors: e.array() });
             }
             // If it's some other error (e.g. DB error)
-            return res.json({ error: e.message });
+            return res.json({ success: false, error: e.message });
         }
 
     });
@@ -74,6 +75,7 @@ router.post('/addnote', fetchUserDetails,
 // Route 3 : Update an existing note for a user using PUT "/api/notes/updatenote/:id" - Login required
 router.put('/updatenote/:id', fetchUserDetails,
     async (req, res) => {
+        let success = false;
         try {
             // Destructure the request body
             const { title, description, tags } = req.body;
@@ -85,11 +87,11 @@ router.put('/updatenote/:id', fetchUserDetails,
             const noteId = req.params.id;
             const note = await Note.findById(noteId);
             if (!note) {
-                return res.status(404).json({error: "Not found"});
+                return res.status(404).json({success:false, error: "Not found"});
             }
             // Check if the note belongs to the user
             if (note.user.toString() !== req.user.userId) {
-                return res.status(401).json({error: "Not allowed to update this note"});
+                return res.status(401).json({success:false, error: "Not allowed to update this note"});
             }
             // Create a new note object with the updated values
             const updatedNote = {};
@@ -105,17 +107,16 @@ router.put('/updatenote/:id', fetchUserDetails,
             // Update the note in the database
             const updatedNoteData = await Note.findByIdAndUpdate(noteId, { $set: updatedNote }, { new: true });
             // Send the created note in the response
-            res.json(updatedNoteData);
+            res.json({success: true, editedNote: updatedNoteData});
 
         } catch (e) {
             // If the validation errors is array
             if (e.array) {
-                return res.status(500).json({ errors: e.array() });
+                return res.status(500).json({ success:false, errors: e.array() });
             }
             // If it's some other error (e.g. DB error)
-            return res.status(500).json({ error: e.message });
+            return res.status(500).json({ success:false, error: e.message });
         }
-
     });
 // ********************************************** ----------------------- ********************************************** //
 
