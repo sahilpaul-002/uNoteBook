@@ -6,6 +6,7 @@ import './App.css';
 import AlertProvider from './contextComponents/AlertState';
 import Alert from './staticComponents/Alert';
 import NoteProvider from './contextComponents/NoteState';
+import LoadingBarProvider from './contextComponents/LoadingBarState';
 
 function App() {
   // Set the document body style
@@ -15,14 +16,16 @@ function App() {
     <>
       <ThemeProvider>
         <AlertProvider>
-          <Navbar />
-          <Alert />
-          <NoteProvider>
-            <div className="container mb-3" style={{ minHeight: "100vh", marginTop: "3rem" }}>
-            <Outlet />
-          </div>
-          </NoteProvider>
-          <Footer />
+          <LoadingBarProvider>
+            <Navbar />
+            <Alert />
+            <NoteProvider>
+              <div className="container mb-3" style={{ minHeight: "100vh", marginTop: "3rem" }}>
+              <Outlet />
+            </div>
+            </NoteProvider>
+            <Footer />
+          </LoadingBarProvider>
         </AlertProvider>
       </ThemeProvider>
     </>

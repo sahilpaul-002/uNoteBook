@@ -16,6 +16,8 @@ export default function AddNote() {
     tags: ""
   });
 
+//--------------------------------------------- Logic to handle on change event of the form ---------------------------------------------\\
+
   // Function to handle on change event
   const handleOnChange = (e) => {
     setNote(prev => ({
@@ -23,6 +25,10 @@ export default function AddNote() {
       [e.target.name]: e.target.value
     }))
   };
+//-------------------------------------------------------************-------------------------------------------------------\\
+
+
+//--------------------------------------------- Logic to handle clicking add button ---------------------------------------------\\
 
   // Function to handle on click event for adding note
   const handleOnAddClick = async (e) => {
@@ -54,6 +60,10 @@ export default function AddNote() {
       })
     }
   };
+//-------------------------------------------------------************-------------------------------------------------------\\
+
+
+//--------------------------------------------- Logic to handle clicking edit button ---------------------------------------------\\
 
   // UseEffect to manage the form population during edit note
   useEffect(() => {
@@ -104,6 +114,54 @@ export default function AddNote() {
       })
     }
   };
+//-------------------------------------------------------************-------------------------------------------------------\\
+
+
+//------------------------------------- Logic for text annimation for form placeholders -------------------------------------\\
+
+  // State to to store the animated text for the form placeholders
+      const [animationText, setanimationText] = useState({
+          titleText: "",
+          descriptionText: ""
+      });
+      // UseEffect to manage the animation of the text in form placeholders
+      useEffect(() => {
+          // Function to animate the text string
+          const animateText = (text, type, interval) => {
+              let i = 0;              // Set counter to manage the setinterval
+              let displayText = ""    // Set dummy text for smoother assignment of state variable
+              // Set the setInterval to animate the text at equal intervals
+              const startAnimation = () => {
+                  const intervalId = setInterval(() => {
+                      if (i < text.length) {
+                          if (text[i] !== undefined) {
+                              displayText += text[i];
+                              setanimationText(prev => ({...prev, [type]:displayText}));
+                          }
+                          // console.log(displayText);
+                          i++;
+                      } else {
+                          clearInterval(intervalId);
+                          setanimationText(prev => ({...prev, [type]:displayText}));  // Clear the text
+                          i = 0;                  // Reset counter
+                          displayText = "";       // Reset dummy text
+                          // Reset and restart after 1s
+                          setTimeout(() => {
+                              startAnimation();       // Restart animation
+                          }, 1000);
+                      }
+                  }, interval);
+              };
+              startAnimation(); // start when component mounts
+          }
+          const titleText = "(min 3 characters....)";
+          const descriptionText = "(min 5 characters....)";
+          animateText(titleText, "titleText", 200);
+          animateText(descriptionText, "descriptionText", 200);
+          // Optional cleanup
+          return () => clearInterval(); // cleanup in case component unmounts
+      }, []);
+//------------------------------------- ************************************* -------------------------------------||
 
   return (
     <div className="container mt-2 mb-5">
@@ -116,11 +174,11 @@ export default function AddNote() {
       <form>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
-          <input type="text" className="form-control" id="title" name="title" placeholder="Enter notes title" value={note.title} aria-describedby="titleHelp" minLength={3} required onChange={handleOnChange} />
+          <input type="text" className="form-control" id="title" name="title" placeholder={`Enter notes title ${animationText.titleText}`} value={note.title} aria-describedby="titleHelp" minLength={3} required onChange={handleOnChange} />
         </div>
         <div className="mb-3">
           <label htmlFor="description" className="form-label">Description</label>
-          <input type="text" className="form-control" id="description" name="description" placeholder="Enter notes description" value={note.description} minLength={5} required onChange={handleOnChange} />
+          <input type="text" className="form-control" id="description" name="description" placeholder={`Enter notes description ${animationText.descriptionText}`} value={note.description} minLength={5} required onChange={handleOnChange} />
         </div>
         <div className="mb-3">
           <label htmlFor="tags" className="form-label">Tags</label>

@@ -4,6 +4,7 @@ import { useLocation } from 'react-router'
 import ThemeContext from '../contexts/ThemeContext';
 import AlertContext from '../contexts/AlertContext';
 import { useNavigate } from "react-router";
+import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function Navbar() {
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
@@ -11,14 +12,25 @@ export default function Navbar() {
   // Destructing context values passed from the parent
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { showAlert } = useContext(AlertContext);
+  const { setProgress } = useContext(LoadingBarContext)
+
+  // Get the current url location
+  let location = useLocation();
 
   // State for collapsed navbar (mobile version)
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+
+  //--------------------------------------- Logic to handle the collaspsed navbar state ---------------------------------------\\
 
   // Function to change the state for collapsed navbar
   const collapsedNavbar = () => {
     setIsCollapsed(!isCollapsed);
   }
+  //--------------------------------------- ************************** ---------------------------------------\\
+
+
+  //--------------------------------------- Logic to handle theme on theme button clicked ---------------------------------------\\
 
   // State to manage the on click event of the theme button
   const [themeButtonClicked, setThemeButtonClicked] = useState(false);
@@ -41,9 +53,9 @@ export default function Navbar() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme,themeButtonClicked]);
+  //--------------------------------------- ************************** ---------------------------------------\\
 
-  // Get the current url location
-  let location = useLocation();
+  //--------------------------------------- Logic to handle logout ---------------------------------------\\
 
   // Function to manage click event on log out
   const handleOnLogOut = () => {
@@ -52,6 +64,7 @@ export default function Navbar() {
       navigate("/login");
     }, 500);
   }
+  //--------------------------------------- ************************** ---------------------------------------\\
 
   return (
     <>
@@ -64,10 +77,10 @@ export default function Navbar() {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className={`nav-link ${location.pathname === "/" ? "active" : ""} ${isCollapsed?"":"ms-3"}`} aria-current="page" to="/">Home</Link>
+                <Link className={`nav-link ${location.pathname === "/" ? "active" : ""} ${isCollapsed?"":"ms-3"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/">Home</Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} to="/about">About</Link>
+                <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/about">About</Link>
               </li>
             </ul>
             <form className="d-flex" role="search">
@@ -79,14 +92,14 @@ export default function Navbar() {
             {localStorage.getItem("loginToken") !== null ?
               <>
               {/*   User Details Page   */}
-                <Link className={`${theme==="light"?"link-dark":"link-light"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-2"}`} aria-current="page" to="/user">
+                <Link className={`${theme==="light"?"link-dark":"link-light"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-2"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/user">
                   <i className="fa-solid fa-circle-user fa-2x"></i>
                 </Link>
-                <Link className={`${theme==="light"?"link-dark":"link-light"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-2 me-4"}`} aria-current="page" onClick={handleOnLogOut}>Log Out</Link> 
+                <Link className={`${theme==="light"?"link-dark":"link-light"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-2 me-4"}`} aria-current="page" onClick={() => {setProgress(prev => prev + 50); handleOnLogOut()}}>Log Out</Link> 
               </>    :
               <>
-                <Link className={`${theme==="light"?location.pathname === "/signup"?"link-dark":"link-secondary":location.pathname === "/signup"?"link-light":"link-secondary"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-1"}`} aria-current="page" to="/signup">Sign Up</Link>
-                <Link className={`${theme==="light"?location.pathname === "/login"?"link-dark":"link-secondary":location.pathname === "/login"?"link-light":"link-secondary"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-1 me-4"}`} aria-current="page" to="/login">Log In</Link>          
+                <Link className={`${theme==="light"?location.pathname === "/signup"?"link-dark":"link-secondary":location.pathname === "/signup"?"link-light":"link-secondary"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-4 me-1"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/signup">Sign Up</Link>
+                <Link className={`${theme==="light"?location.pathname === "/login"?"link-dark":"link-secondary":location.pathname === "/login"?"link-light":"link-secondary"} link-opacity-50-hover link-underline-opacity-0 ${isCollapsed ? "float-start my-2 mx-2" : "ms-1 me-4"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/login">Log In</Link>          
               </>
             }
 
