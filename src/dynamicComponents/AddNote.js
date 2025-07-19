@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import NoteContext from '../contexts/NoteContext';
 import DisableButtonContext from '../contexts/DisableButtonContext';
 import AlertContext from '../contexts/AlertContext';
+import {capitalize} from '../Functions';
 
 export default function AddNote() {
   // Destructing context values passed from the parent
@@ -37,12 +38,20 @@ export default function AddNote() {
 
     let response = null;
     try {
-      response = await addNote(note.title, note.description, note.tags);
+      // Check if user input has tags
+      if (note.tags==="") {
+        response = await addNote(note.title, note.description);
+      }
+      else {
+        response = await addNote(note.title, note.description, capitalize(note.tags));
+      }
+      // Check API response
       if (!response.success) {
         console.log(response); // Capture response errors
         showAlert("Unable to add the note due to server issue", "danger");// Display error alert message
         return;
       }
+      console.log(response);
       showAlert("Note added successfully !", "success");// Display success alert message
       // Scroll to the top of the page
       setTimeout(() => {
@@ -82,7 +91,14 @@ export default function AddNote() {
     e.preventDefault();
     let response = null;
     try {
-      response = await editNote(disableButton.editNote._id, note.title, note.description, note.tags);
+      // Check if user input has tags
+      if (note.tags==="") {
+        response = await editNote(disableButton.editNote._id, note.title, note.description);
+      }
+      else {
+        response = await editNote(disableButton.editNote._id, note.title, note.description, capitalize(note.tags));
+      }
+      // Check API response
       if (!response.success) {
         console.log(response); // Capture response errors
         showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
@@ -91,7 +107,7 @@ export default function AddNote() {
       showAlert("Note edited successfully !", "success");// Display success alert message
       // Scroll to the edited note of the page
       setTimeout(() => {
-        const noteElement = document.getElementById(`note-${disableButton.editNote._id}`);
+        const noteElement = document.getElementById(`note:${disableButton.editNote._id}`);
         if (noteElement) {
           noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -184,8 +200,8 @@ export default function AddNote() {
           <label htmlFor="tags" className="form-label">Tags</label>
           <input type="text" className="form-control" id="tags" name="tags" placeholder="Enter notes tags" value={note.tags} onChange={handleOnChange} />
         </div>
-        <button type="submit" className="btn btn-outline-success" disabled={disableButton.addButton || note.title.length < 3 || note.description.length < 5 ? true : false} onClick={handleOnAddClick}>Add Note</button>
-        <button type="submit" className="btn btn-outline-success mx-3" disabled={disableButton.editButton || note.title.length < 3 || note.description.length < 5 ? true : false} onClick={handleOnEditClick}>Edit Note</button>
+        <button type="submit" className="btn btn-outline-success" disabled={disableButton.addButton || note.title.trim().length < 3 || note.description.trim().length < 5 ? true : false} onClick={handleOnAddClick}>Add Note</button>
+        <button type="submit" className="btn btn-outline-success mx-3" disabled={disableButton.editButton || note.title.trim().length < 3 || note.description.trim().length < 5 ? true : false} onClick={handleOnEditClick}>Edit Note</button>
       </form>
     </div>
   )

@@ -22,7 +22,7 @@ router.post("/",
                 throw new Error('E-mail already in use');
             }
         }),
-        body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long'),
+        body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long')
     ],
     async (req, res) => {
         let success = false;
@@ -83,6 +83,7 @@ router.post('/login',
             }
             // Destructure email and password from the request body
             const { email, password } = req.body;
+            console.log(email, password)
             // Find the user by email
             const user = await User.findOne({ 'email': email });
             // If user not found, throw an error
@@ -121,7 +122,7 @@ router.post('/login',
 
 
 // ********************************************** User details afeter login logic ********************************************** //
-// Route 1 : Get loggedin user detaisl using POST "/api/auth/getuser" - Login required
+// Route 3 : Get loggedin user detaisl using GET "/api/auth/getuser" - Login required
 router.post('/getuser', fetchUserDetails, async (req, res) => {
     let success = false;
     try {
@@ -130,16 +131,9 @@ router.post('/getuser', fetchUserDetails, async (req, res) => {
         // Find the user by ID
         const user = await User.findById(userId).select("-password -__v");
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ success: false, error: "User not found" });
         }
-        // Send the user details in the response
-        // res.json({
-        //     userId: user._id,
-        //     name: user.name,
-        //     email: user.email,
-        //     timeStamp: user.timeStamp
-        // });
-        res.json(user);
+        res.json({ success: true, user: user });
     } catch (e) {
         if (e.array) {
             // If it's a validation error
@@ -149,8 +143,71 @@ router.post('/getuser', fetchUserDetails, async (req, res) => {
         return res.json({ success: false, error: e.message });
     }
 });
+// ********************************************** ---------------- ********************************************** //
 
 
+// ********************************************** Update user details afeter login logic ********************************************** //
+// Route 4 : Update loggedin user details using POST "/api/auth/updateuser" - Login required
+router.post('/updateuser', fetchUserDetails,
+    [
+        body('name').notEmpty().withMessage('Name is required'),
+        body('email').isEmail().withMessage('Valid email is required').custom(async (value, { req }) => {
+            // Find a user with this email
+            const user = await User.findOne({ email: value });
+
+            // If another user already has this email, block it
+            if (user && user._id.toString() !== req.user.id) {
+                throw new Error('E-mail already in use by another account');
+            }
+            return true;
+        }),
+        body('password').isLength({ min: 4 }).withMessage('Password must be at least 4 characters long')
+    ],
+    async (req, res) => {
+        let success = false;
+        // Check for validation errors
+        const validationErrors = validationResult(req);
+        try {
+            // If there are validation errors, throw them
+            if (!validationErrors.isEmpty()) {
+                validationErrors.throw();
+            }
+            // Get the user ID from the request object
+            const userId = req.user.userId;
+            // Build update object dynamically
+            const updateFields = {};
+            if (req.body.name) {
+                updateFields.name = req.body.name;
+            }
+            if (req.body.email) {
+                updateFields.email = req.body.email;
+            }
+            if (req.body.password) {
+                const salt = await bcrypt.genSalt(10);
+                const cryptPassword = await bcrypt.hash(req.body.password, salt);
+                updateFields.password = cryptPassword;
+            }
+            // Find and update user
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { $set: updateFields },
+                { new: true } // return updated user
+            ).select('-password');  // Exclude the password field
+            // Cehck user is fetched with new credentials
+            if (!user) {
+                return res.status(404).json({ success: false, error: 'User not found' });
+            }
+            res.json({ success: true, user: user });
+        }
+        catch (e) {
+            if (e.array) {
+                // If it's a validation error
+                return res.json({ success: false, errors: e.array() });
+            }
+            // If it's some other error (e.g. DB error)
+            return res.json({ success: false, error: e.message });
+        }
+    });
 // ********************************************** ---------------- ********************************************** //
 
 export { router };

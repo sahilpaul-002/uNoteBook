@@ -23,7 +23,6 @@ router.get('/fetchallnotes', fetchUserDetails, async (req, res) => {
     } catch (e) {
         res.status(500).json({ success: false, error: e.message });
     }
-
 });
 // ********************************************** ----------------------- ********************************************** //
 

@@ -62,34 +62,40 @@ export default function UserLogin() {
   const handleOnSubmit = async (e) => {
     // Prevent the default functionality of reloading the page upon submit
     e.preventDefault();
-    console.log(userLDetails);
-    // Logic to get user logged in
-    const response = await fetch(`${HOST}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userLDetails)
-    });
-    const json = await response.json();
-    console.log(json);
-    // Check response is a success
-    if (json.success) {
-      // Save the auth token and redirect
-      localStorage.setItem('loginToken', json.authToken);
-      console.log(localStorage)
-      navigate("/");// After successfull login and token storing redirect the user to the home page
-      showAlert("Login successful", "success"); // Display alert
+    try {
+      // Logic to get user logged in
+      const response = await fetch(`${HOST}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userLDetails)
+      });
+      const json = await response.json();
+      // Check response is a success
+      if (json.success) {
+        // Save the auth token and redirect
+        localStorage.setItem('loginToken', json.authToken);
+        console.log(localStorage)
+        navigate("/");// After successfull login and token storing redirect the user to the home page
+        showAlert("Login successful", "success"); // Display alert
+      }
+      else {
+        showAlert("Unable to login", "danger"); // Display alert
+        console.error({ Error: "Falied to login", Response: json })
+      }
     }
-    else {
-      showAlert("Unable to login", "danger"); // Display alert
+    catch (e) {
+      console.error("Error:", e.message); // Capture other than response errors
+      showAlert("Unable to login", "danger");// Display error alert message
     }
-
-    setUserLDetails({
-      email: "",
-      password: ""
-    })
-    setDisabledButton(prev => (!prev));
+    finally {
+      setUserLDetails({
+        email: "",
+        password: ""
+      })
+      setDisabledButton(prev => (!prev));
+    }
   }
   //-----------------------------------------------------****************-----------------------------------------------------\\
 

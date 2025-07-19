@@ -49,7 +49,7 @@ export default function UserSignUp() {
 
   //UseEffect to manage the disable button state
   useEffect(() => {
-    if (userSDetails.userName.trim() !== "" && userSDetails.email.trim() !== "" && userSDetails.password.trim() !== "" && userSDetails.email.includes("@") && userSDetails.password.trim() >= 4 && userSDetails.password === userSDetails.confirmPassword) {
+    if (userSDetails.userName.trim() !== "" && userSDetails.email.trim() !== "" && userSDetails.email.includes("@") && userSDetails.password.trim() !== "" && userSDetails.password.length >= 4 && userSDetails.password === userSDetails.confirmPassword) {
       setDisabledButton(false)
     }
     else {
@@ -59,44 +59,50 @@ export default function UserSignUp() {
   //-----------------------------------------------------****************-----------------------------------------------------\\
 
 
-  //------------------------------------- Logic to handle submission of form placeholders -------------------------------------\\
+  //------------------------------------- Logic to handle submission of form  -------------------------------------\\
 
   // Function to handle on form submit
   const handleOnSubmit = async (e) => {
     // Prevent the default functionality of reloading the page upon submit
     e.preventDefault();
 
-    const { userName, email, password } = userSDetails;
-
-    // Logic to get user logged in
-    const response = await fetch(`${HOST}/api/auth`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: userName, email, password })
-    });
-    const json = await response.json();
-    // console.log(json);
-    // Check response is a success
-    if (json.success) {
-      // Save the auth token and redirect
-      localStorage.setItem('signupToken', json.authToken);
-      // console.log(localStorage)
-      navigate("/login");// After successfull signup and token storing redirect the user to the login page
-      showAlert("Sign up successful", "success"); // Display alert
+    try {
+      const { userName, email, password } = userSDetails;
+      // Logic to get user logged in
+      const response = await fetch(`${HOST}/api/auth`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: userName, email, password })
+      });
+      const json = await response.json();
+      // Check response is a success
+      if (json.success) {
+        // Save the auth token and redirect
+        localStorage.setItem('signupToken', json.authToken);
+        // console.log(localStorage)
+        navigate("/login");// After successfull signup and token storing redirect the user to the login page
+        showAlert("Sign up successful", "success"); // Display alert
+      }
+      else {
+        showAlert("Unable to sign in", "danger"); // Display alert
+        console.error({ Error: "Falied to sign in", Response: json })
+      }
     }
-    else {
-      showAlert("Unable to login", "danger"); // Display alert
+    catch (e) {
+      console.error("Error:", e.message); // Capture other than response errors
+      showAlert("Unable to sign in", "danger");// Display error alert message
     }
-
-    setuserSDetails({
-      userName: "",
-      email: "",
-      password: "",
-      confirmPassword: ""
-    });
-    setDisabledButton(prev => (!prev));
+    finally {
+      setuserSDetails({
+        userName: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+      });
+      setDisabledButton(prev => (!prev));
+    }
   }
   //-----------------------------------------------------****************-----------------------------------------------------\\
 
