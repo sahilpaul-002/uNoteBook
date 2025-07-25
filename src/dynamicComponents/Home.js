@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import Notes from './Notes'
 import AddNote from './AddNote'
 import NoteContext from '../contexts/NoteContext';
@@ -6,6 +6,7 @@ import DisableButtonStateProvider from '../contextComponents/DisableButtonsState
 import { useNavigate } from "react-router";
 import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
+import ResponseInContext from '../contexts/ResponseInContext';
 
 export default function Home() {
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
@@ -27,7 +28,9 @@ export default function Home() {
 
 
   //---------------------------------- Logic to load all the user notes if user authenticated ----------------------------------\\
-
+  
+  // State to check  API response delivered
+  const [responseIn, setResponseIn] = useState(false) 
   //UseEffect to check if the user is authenticated and load all user notes
   useEffect(() => {
     if (localStorage.getItem("loginToken") === null) {
@@ -40,11 +43,15 @@ export default function Home() {
       const fetchNotes = async () => {
         let response = null;
         try {
-          response = await getAllNotes();
-          if (!response.success) {
-            console.error(response); // Capture response errors
-            return;
-          }
+          // response = await getAllNotes();
+          setTimeout(async () => {
+            response = await getAllNotes();
+            if (!response.success) {
+              console.error(response); // Capture response errors
+              return;
+            }
+            setResponseIn(prev => !prev); // Set the state for checking API response delivered
+          }, 1000)
         }
         catch (error) {
           console.error("Error fetching notes:", error.message); // Capture other than response errors
@@ -63,8 +70,9 @@ export default function Home() {
         <AddNote />
 
         <hr />
-
+        <ResponseInContext value={{responseIn, setResponseIn}}>
         <Notes />
+        </ ResponseInContext>
       </DisableButtonStateProvider>
     </div>
   )

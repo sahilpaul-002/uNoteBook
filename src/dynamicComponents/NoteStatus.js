@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 import NoteContext from '../contexts/NoteContext';
+import Spinner from '../staticComponents/Spinner';
 
 export default function NoteStatus() {
     const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
@@ -58,48 +59,59 @@ export default function NoteStatus() {
 
     //------------------------------------- Logic to handle drag and drop -------------------------------------\\
 
-    //
+    // State to manage the status columns
     const [columns, setColumns] = useState({});
 
-    useEffect(() => {
-        const newColumns = { pending: [], inProgress: [], complete: [] };
+    //
+    const [responseIn, setResponseIn] = useState(false);
 
-        notes.forEach((note) => {
-            if (note.pending) {
-                newColumns.pending.push({
-                    id: note._id,
-                    noteTitle: note.title,
-                    noteDescription: note.description,
-                    color: "danger",
-                });
-            }
-            else if (note.inProgress) {
-                newColumns.inProgress.push({
-                    id: note._id,
-                    noteTitle: note.title,
-                    noteDescription: note.description,
-                    color: "warning",
-                });
-            }
-            else if (note.complete) {
-                newColumns.complete.push({
-                    id: note._id,
-                    noteTitle: note.title,
-                    noteDescription: note.description,
-                    color: "success",
-                });
-            }
-        });
-        setColumns(newColumns);
+    // UseEffect to populate columsn with the notes
+    useEffect(() => {
+
+        setTimeout(() => {
+            const newColumns = { pending: [], inProgress: [], complete: [] };
+
+            notes.forEach((note) => {
+                if (note.pending) {
+                    newColumns.pending.push({
+                        id: note._id,
+                        noteTitle: note.title,
+                        noteDescription: note.description,
+                        color: "danger",
+                    });
+                }
+                else if (note.inProgress) {
+                    newColumns.inProgress.push({
+                        id: note._id,
+                        noteTitle: note.title,
+                        noteDescription: note.description,
+                        color: "warning",
+                    });
+                }
+                else if (note.complete) {
+                    newColumns.complete.push({
+                        id: note._id,
+                        noteTitle: note.title,
+                        noteDescription: note.description,
+                        color: "success",
+                    });
+                }
+            });
+            setResponseIn(true); // Change the state once the updating columns state is over
+            setColumns(newColumns);
+        }, 1000)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notes]);
 
+    // State to manage the information of the notes in the card that is being dragged
     const [draggingCard, setDraggingCard] = useState(null);
 
+    // Function to handle drrag start
     const handleDragStart = (card, sourceCol) => {
         setDraggingCard({ ...card, sourceCol });
     };
 
+    // Function to handle the drop
     const handleDrop = async (targetCol) => {
         if (!draggingCard) {
             return;
@@ -139,28 +151,46 @@ export default function NoteStatus() {
     //-----------------------------------------------------****************-----------------------------------------------------\\
 
     return (
-        <div
-            className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-            {Object.entries(columns).map(([colId, items]) => (
-                <div
-                    key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
-                    <div className="card h-100">
-                        <ul className="list-group list-group-flush">
-                            {items.map((item) => (
-                                <li key={item.id} className="list-group-item" draggable onDragStart={() => handleDragStart(item, colId)}>
-                                    <div
-                                        className={`card text-bg-${item.color} mb-3`} style={{ cursor: "grab" }}>
-                                        <div className="card-header">{item.noteTitle}</div>
-                                        <div className="card-body">
-                                            <p className="card-text">{item.noteDescription}</p>
+        <>
+            {
+                responseIn ?
+                    (
+                        columns.pending.length!==0 || columns.inProgress.length!==0 || columns.complete.length!==0 ?
+                            (
+                                <div
+                                    className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                                    {Object.entries(columns).map(([colId, items]) => (
+                                        <div
+                                            key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
+                                            <div className="card h-100">
+                                                <ul className="list-group list-group-flush">
+                                                    {items.map((item) => (
+                                                        <li key={item.id} className="list-group-item" draggable onDragStart={() => handleDragStart(item, colId)}>
+                                                            <div
+                                                                className={`card text-bg-${item.color} mb-3`} style={{ cursor: "grab" }}>
+                                                                <div className="card-header">{item.noteTitle}</div>
+                                                                <div className="card-body">
+                                                                    <p className="card-text">{item.noteDescription}</p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            ))}
-        </div>
+                                    ))}
+                                </div>
+                            ) :
+                            (
+                                <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+                                    <h5>😢 Oops! No notes available. Please add some.</h5>
+                                </div>
+                            )
+                    )
+                    :
+                    <Spinner />
+            }
+        </>
+
     );
 }

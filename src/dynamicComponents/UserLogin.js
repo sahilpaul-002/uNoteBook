@@ -156,10 +156,6 @@ export default function UserLogin() {
           <label htmlFor="password" className="form-label">Password</label>
           <input type="password" className="form-control" id="password" name='password' placeholder={`Enter your password ${animationText.passwordText}`} value={userLDetails.password} required onChange={handleOnChange} />
         </div>
-        <div className="mb-4 form-check">
-          <input type="checkbox" className="form-check-input" id="exampleCheck1" />
-          <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
-        </div>
         <button type="submit" className="btn btn-outline-danger my-2" disabled={disabledButton}>Submit</button>
       </form>
     </div>

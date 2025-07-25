@@ -172,10 +172,6 @@ export default function UserSignUp() {
           <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
           <input type="password" className="form-control" id="confirmPassword" name='confirmPassword' placeholder={`Re-enter your password ${animationText.passwordText}`} value={userSDetails.confirmPassword} required onChange={handleOnChange} />
         </div>
-        <div className="mb-4 form-check">
-          <input type="checkbox" className="form-check-input" id="exampleCheck1" />
-          <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
-        </div>
         <button type="submit" className="btn btn-outline-danger my-2" disabled={disabledButton}>Submit</button>
       </form>
     </div>
