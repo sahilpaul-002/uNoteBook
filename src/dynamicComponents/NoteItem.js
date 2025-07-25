@@ -10,33 +10,33 @@ export default function NoteItem(props) {
 
     // Destructing context values passed from the parent
     const { theme } = useContext(ThemeContext);
-    const { getAllNotes, deleteNote } = useContext(NoteContext)
+    const { getAllNotes, deleteNote, editNoteStatus } = useContext(NoteContext)
     const { setDisableButton } = useContext(DisableButtonContext);
     const { showAlert } = useContext(AlertContext);
 
     //---------------------------------- Logic to load all the user notes on page landing ----------------------------------\\
 
     // UseEffect to load all the notes on page landing
-    useEffect(() => {
-        if (localStorage.getItem("loginToken") !== null) {
-            const fetchNotes = async () => {
-                let response = null;
-                try {
-                    response = await getAllNotes();
-                    if (!response.success) {
-                        console.log(response); // Capture response errors
-                        return;
-                    }
-                }
-                catch (error) {
-                    console.error("Error fetching notes:", error.message); // Capture other than response errors
-                }
-            };
+    // useEffect(() => {
+    //     if (localStorage.getItem("loginToken") !== null) {
+    //         const fetchNotes = async () => {
+    //             let response = null;
+    //             try {
+    //                 response = await getAllNotes();
+    //                 if (!response.success) {
+    //                     console.error(response); // Capture response errors
+    //                     return;
+    //                 }
+    //             }
+    //             catch (error) {
+    //                 console.error("Error fetching notes:", error.message); // Capture other than response errors
+    //             }
+    //         };
 
-            fetchNotes(); // call the async function
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    //         fetchNotes(); // call the async function
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
     //---------------------------------------------------- ******** ----------------------------------------------------\\
 
     //----------------------------- Logic to handle on click event of the edit button -----------------------------\\
@@ -71,92 +71,78 @@ export default function NoteItem(props) {
 
     // State to store the clicked action on task status
     const [taskStatus, setTaskStatus] = useState({
-        pending: {},
-        inProgress: {},
-        complete: {}
+        noteId: null,
+        pending: true,
+        inProgress: false,
+        complete: false
     })
 
     // Function to handle the on click event on for pending status
     const handleOnClickedP = (noteId) => {
         // Change the state based on the criteria
-        const {pending, inProgress, complete} = taskStatus;
-        if (Object.keys(pending).length===0) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                inProgress: Object.fromEntries(Object.entries(inProgress).filter(([id]) => id !== noteId)),
-                complete: Object.fromEntries(Object.entries(complete).filter(([id]) => id !== noteId)),
-                pending: {[noteId]: true}
-            }));
-        }
-        else if (Object.keys(pending).length!==0 && !(noteId in pending)) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                inProgress: Object.fromEntries(Object.entries(inProgress).filter(([id]) => id !== noteId)),
-                complete: Object.fromEntries(Object.entries(complete).filter(([id]) => id !== noteId)),
-                pending: {...pending, [noteId]: true}
-            }));
-        }
-        else {
-            setTaskStatus(prev => ({
-                ...prev,
-                pending: Object.fromEntries(Object.entries(pending).filter(([id]) => id !== noteId))
-            }));
-        }
+        setTaskStatus({
+            noteId: noteId,
+            pending: true,
+            inProgress: false,
+            complete: false
+        })
     }
+
     // Function to handle the on click event on for in-progress status
     const handleOnClickedIP = (noteId) => {
         // Change the state based on the criteria
-        const {pending, inProgress, complete} = taskStatus;
-        if (Object.keys(inProgress).length===0) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                pending: Object.fromEntries(Object.entries(pending).filter(([id]) => id !== noteId)),
-                complete: Object.fromEntries(Object.entries(complete).filter(([id]) => id !== noteId)),
-                inProgress: {[noteId]: true}
-            }));
-        }
-        else if (Object.keys(inProgress).length!==0 && !(noteId in inProgress)) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                pending: Object.fromEntries(Object.entries(pending).filter(([id]) => id !== noteId)),
-                complete: Object.fromEntries(Object.entries(complete).filter(([id]) => id !== noteId)),
-                inProgress: {...inProgress, [noteId]: true}
-            }));
-        }
-        else {
-            setTaskStatus(prev => ({
-                ...prev,
-                inProgress: Object.fromEntries(Object.entries(inProgress).filter(([id]) => id !== noteId))
-            }));
-        }
+        setTaskStatus({
+            noteId: noteId,
+            pending: false,
+            inProgress: true,
+            complete: false
+        })
     }
-    // 
-    const handleOnClickedC = (noteId) => {
+
+    // Function to handle the on click event on for complete status
+    const handleOnClickedC = async (noteId) => {
         // Change the state based on the criteria
-        const {pending, inProgress, complete} = taskStatus;
-        if (Object.keys(complete).length===0) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                pending: Object.fromEntries(Object.entries(pending).filter(([id]) => id !== noteId)),
-                inProgress: Object.fromEntries(Object.entries(inProgress).filter(([id]) => id !== noteId)),
-                complete: {[noteId]: true}
-            }));
-        }
-        else if (Object.keys(complete).length!==0 && !(noteId in complete)) {
-            setTaskStatus(prev => ({
-                // ...prev,
-                pending: Object.fromEntries(Object.entries(pending).filter(([id]) => id !== noteId)),
-                inProgress: Object.fromEntries(Object.entries(inProgress).filter(([id]) => id !== noteId)),
-                complete: {...complete, [noteId]: true}
-            }));
-        }
-        else {
-            setTaskStatus(prev => ({
-                ...prev,
-                complete: Object.fromEntries(Object.entries(complete).filter(([id]) => id !== noteId))
-            }));
-        }
+        setTaskStatus({
+            noteId: noteId,
+            pending: false,
+            inProgress: false,
+            complete: true
+        });
     }
+
+    //UseEffect to handle the UI change and database update on the status change
+    useEffect(() => {
+        const updateNoteStatus = async () => {
+            // Destructure the statrs state
+            const { noteId, pending, inProgress, complete } = taskStatus;
+
+            if (noteId !== null) {
+                let response = null;
+                try {
+                    response = await editNoteStatus(noteId, { pending, inProgress, complete });
+                    // Check API response
+                    if (!response.success) {
+                        console.error(response); // Capture response errors
+                        showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                        return;
+                    }
+                    showAlert("Status changed successfully !", "success");// Display success alert message
+                    // Scroll to the edited note of the page
+                    setTimeout(() => {
+                        const noteElement = document.getElementById(`note:${noteId}`);
+                        if (noteElement) {
+                            noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                } catch (e) {
+                    console.error("Error updating notes status:", e.message); // Capture other than response errors
+                    showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                }
+            }
+        }
+        updateNoteStatus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [taskStatus])
     //---------------------------------------------------- ******** ----------------------------------------------------\\
 
     return (
@@ -170,10 +156,10 @@ export default function NoteItem(props) {
                         <div className={`card text-bg-${theme === "dark" ? "dark" : "light"} mb-3`} id={`note:${note._id}`} key={note._id} style={{ maxWidth: "100%" }}>
                             <div className="card-header">
                                 <h5>Title: {note.title}</h5>
-                                <div className="d-flex justify-content-end align-items-center" style={{cursor: "pointer"}}>
-                                    <span className={`badge ${note._id in taskStatus.pending?"text-bg-danger":"text-bg-secondary"} mx-1`} id={`note:${note._id}`} onClick={() => {handleOnClickedP(note._id)}} >Pending</span>
-                                    <span className={`badge ${note._id in taskStatus.inProgress?"text-bg-warning":"text-bg-secondary"} mx-1`} onClick={() => {handleOnClickedIP(note._id)}} >In Progress</span>
-                                    <span className={`badge ${note._id in taskStatus.complete?"text-bg-success":"text-bg-secondary"} mx-1`} onClick={() => {handleOnClickedC(note._id)}} >complete</span>
+                                <div className="d-flex justify-content-end align-items-center" style={{ cursor: "pointer" }}>
+                                    <span className={`badge ${note.pending ? "text-bg-danger" : "text-bg-secondary"} mx-1`} id={`note:${note._id}`} onClick={() => { handleOnClickedP(note._id) }} >Pending</span>
+                                    <span className={`badge ${note.inProgress ? "text-bg-warning" : "text-bg-secondary"} mx-1`} onClick={() => { handleOnClickedIP(note._id) }} >In Progress</span>
+                                    <span className={`badge ${note.complete ? "text-bg-success" : "text-bg-secondary"} mx-1`} onClick={() => { handleOnClickedC(note._id) }} >complete</span>
                                 </div>
                             </div>
                             <div className="card-body" style={{ backgroundColor: 'transparent' }}>

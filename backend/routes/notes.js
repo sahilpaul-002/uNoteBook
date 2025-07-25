@@ -48,12 +48,23 @@ router.post('/addnote', fetchUserDetails,
                 validationErrors.throw();
             }
             // If no errors, create a new note
-            const note = await Note.create({
-                user: req.user.userId,
-                title: req.body.title,
-                description: req.body.description,
-                tags: req.body.tags
-            })
+            let note = null;
+            if (req.body.tags) {
+                note = await Note.create({
+                    user: req.user.userId,
+                    title: req.body.title,
+                    description: req.body.description,
+                    tags: req.body.tags
+                })
+            }
+            else {
+                note = await Note.create({
+                    user: req.user.userId,
+                    title: req.body.title,
+                    description: req.body.description
+                    // tags: req.body.tags
+                })
+            }
             // Send the created note in the response
             res.json({success: true, note: note});
 
@@ -70,7 +81,7 @@ router.post('/addnote', fetchUserDetails,
 // ********************************************** ----------------------- ********************************************** //
 
 
-// ********************************************** Updates Notes Logic logic ********************************************** //
+// ********************************************** Updates Notes Logic ********************************************** //
 // Route 3 : Update an existing note for a user using PUT "/api/notes/updatenote/:id" - Login required
 router.put('/updatenote/:id', fetchUserDetails,
     async (req, res) => {
@@ -103,9 +114,12 @@ router.put('/updatenote/:id', fetchUserDetails,
             if (tags) {
                 updatedNote.tags = tags;
             }
+            else {
+                updatedNote.tags = "Default";
+            }
             // Update the note in the database
             const updatedNoteData = await Note.findByIdAndUpdate(noteId, { $set: updatedNote }, { new: true });
-            // Send the created note in the response
+            // Send the edited note in the response
             res.json({success: true, editedNote: updatedNoteData});
 
         } catch (e) {
@@ -153,6 +167,47 @@ router.delete('/deletenote/:id', fetchUserDetails,
             return res.status(500).json({ error: e.message });
         }
 
+    });
+// ********************************************** ----------------------- ********************************************** //
+
+
+// ********************************************** Updates Notes Status Logic ********************************************** //
+// Route 3 : Update an existing note for a user using PUT "/api/notes/updatenote/:id" - Login required
+router.put('/updatenotestatus/:id', fetchUserDetails,
+    async (req, res) => {
+        let success = false;
+        try {
+            // Destructure the request body
+            // const { pending, inProgress, complete } = req.body;
+            // Check user is logged in
+            if (!req.user) {
+                throw new Error("User not logged in");
+            }
+            // Validate the note ID
+            const noteId = req.params.id;
+            const note = await Note.findById(noteId);
+            if (!note) {
+                return res.status(404).json({success:false, error: "Not found"});
+            }
+            // Check if the note belongs to the user
+            if (note.user.toString() !== req.user.userId) {
+                return res.status(401).json({success:false, error: "Not allowed to update this note"});
+            }
+            // Create a new note object with the updated values
+            const updatedNote = req.body.updatedFields;
+            // Update the note in the database
+            const updatedNoteData = await Note.findByIdAndUpdate(noteId, { $set: updatedNote }, { new: true });
+            // Send the edited note in the response
+            res.json({success: true, editedNote: updatedNoteData});
+
+        } catch (e) {
+            // If the validation errors is array
+            if (e.array) {
+                return res.status(500).json({ success:false, errors: e.array() });
+            }
+            // If it's some other error (e.g. DB error)
+            return res.status(500).json({ success:false, error: e.message });
+        }
     });
 // ********************************************** ----------------------- ********************************************** //
 

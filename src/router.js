@@ -6,6 +6,7 @@ import UserSignUp from "./dynamicComponents/UserSignUp";
 import UserLogin from "./dynamicComponents/UserLogin";
 import About from "./staticComponents/About";
 import UserDetails from "./dynamicComponents/UserDetails";
+import NoteStatus from "./dynamicComponents/NoteStatus";
 
 const router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: "user",
                 Component: UserDetails
+            },
+            {
+                path: "notestatus",
+                Component: NoteStatus
             }
         ]
     },

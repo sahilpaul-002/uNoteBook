@@ -38,20 +38,20 @@ export default function AddNote() {
 
     let response = null;
     try {
+      response = await addNote(note.title, note.description, capitalize(note.tags));
       // Check if user input has tags
-      if (note.tags==="") {
-        response = await addNote(note.title, note.description);
-      }
-      else {
-        response = await addNote(note.title, note.description, capitalize(note.tags));
-      }
+      // if (note.tags==="") {
+      //   response = await addNote(note.title, note.description);
+      // }
+      // else {
+      //   response = await addNote(note.title, note.description, capitalize(note.tags));
+      // }
       // Check API response
       if (!response.success) {
-        console.log(response); // Capture response errors
+        console.error(response); // Capture response errors
         showAlert("Unable to add the note due to server issue", "danger");// Display error alert message
         return;
       }
-      console.log(response);
       showAlert("Note added successfully !", "success");// Display success alert message
       // Scroll to the top of the page
       setTimeout(() => {
@@ -91,16 +91,17 @@ export default function AddNote() {
     e.preventDefault();
     let response = null;
     try {
+      response = await editNote(disableButton.editNote._id, note.title, note.description, capitalize(note.tags));
       // Check if user input has tags
-      if (note.tags==="") {
-        response = await editNote(disableButton.editNote._id, note.title, note.description);
-      }
-      else {
-        response = await editNote(disableButton.editNote._id, note.title, note.description, capitalize(note.tags));
-      }
+      // if (note.tags==="") {
+      //   response = await editNote(disableButton.editNote._id, note.title, note.description);
+      // }
+      // else {
+      //   response = await editNote(disableButton.editNote._id, note.title, note.description, capitalize(note.tags));
+      // }
       // Check API response
       if (!response.success) {
-        console.log(response); // Capture response errors
+        console.error(response); // Capture response errors
         showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
         return;
       }
@@ -113,7 +114,7 @@ export default function AddNote() {
         }
       }, 100);
     } catch (e) {
-      console.error("Error fetching notes:", e.message); // Capture other than response errors
+      console.error("Error editing notes:", e.message); // Capture other than response errors
       showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
     }
     finally {

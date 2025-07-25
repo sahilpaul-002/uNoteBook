@@ -76,7 +76,6 @@ export default function UserLogin() {
       if (json.success) {
         // Save the auth token and redirect
         localStorage.setItem('loginToken', json.authToken);
-        console.log(localStorage)
         navigate("/");// After successfull login and token storing redirect the user to the home page
         showAlert("Login successful", "success"); // Display alert
       }
@@ -121,7 +120,6 @@ export default function UserLogin() {
               displayText += text[i];
               setanimationText(prev => ({ ...prev, [type]: displayText }));
             }
-            // console.log(displayText);
             i++;
           } else {
             clearInterval(intervalId);

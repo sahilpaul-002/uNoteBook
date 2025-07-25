@@ -83,7 +83,6 @@ router.post('/login',
             }
             // Destructure email and password from the request body
             const { email, password } = req.body;
-            console.log(email, password)
             // Find the user by email
             const user = await User.findOne({ 'email': email });
             // If user not found, throw an error

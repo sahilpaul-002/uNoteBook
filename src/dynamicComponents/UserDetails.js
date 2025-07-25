@@ -51,7 +51,6 @@ export default function UserDetails() {
                     showAlert("Unable fetch your detils right now. Sorry!", "danger");// Display error alert message
                     return;
                 }
-                console.log(json);
                 setUserDetails(prev => ({
                     ...prev,
                     userName: json.user.name,
@@ -123,7 +122,6 @@ export default function UserDetails() {
                 body: JSON.stringify({ name: userName, email, password })
             });
             const json = await response.json();
-            console.log(json);
             // Check response is a success
             if (json.success) {
                 // Populate the form with new user details

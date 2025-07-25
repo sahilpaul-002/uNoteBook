@@ -5,6 +5,7 @@ import ThemeContext from '../contexts/ThemeContext';
 import AlertContext from '../contexts/AlertContext';
 import { useNavigate } from "react-router";
 import LoadingBarContext from '../contexts/LoadingBarContext';
+import NoteContext from '../contexts/NoteContext';
 
 export default function Navbar() {
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
@@ -12,6 +13,7 @@ export default function Navbar() {
   // Destructing context values passed from the parent
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { showAlert } = useContext(AlertContext);
+  const { setNotes } = useContext(NoteContext);
   const { setProgress } = useContext(LoadingBarContext)
 
   // Get the current url location
@@ -60,6 +62,7 @@ export default function Navbar() {
   // Function to manage click event on log out
   const handleOnLogOut = () => {
     localStorage.removeItem("loginToken");
+    setNotes([]);
     setTimeout(() => {
       navigate("/login");
     }, 500);
@@ -78,6 +81,9 @@ export default function Navbar() {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
                 <Link className={`nav-link ${location.pathname === "/" ? "active" : ""} ${isCollapsed?"":"ms-3"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/">Home</Link>
+              </li>
+              <li className={`nav-item ${isCollapsed?"":"mx-1"}`}>
+                <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/notestatus">Note Status</Link>
               </li>
               <li className="nav-item">
                 <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/about">About</Link>

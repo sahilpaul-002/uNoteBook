@@ -1,0 +1,166 @@
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate } from "react-router";
+import AlertContext from '../contexts/AlertContext';
+import LoadingBarContext from '../contexts/LoadingBarContext';
+import NoteContext from '../contexts/NoteContext';
+
+export default function NoteStatus() {
+    const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
+
+    // Destructing context values passed from the parent
+    const { showAlert } = useContext(AlertContext);
+    const { progress, setProgress } = useContext(LoadingBarContext)
+    const { notes, getAllNotes, editNoteStatus } = useContext(NoteContext);
+
+    //------------------------------------- Logic to show the loading by managing the state -------------------------------------\\
+
+    // UseEffect to manage the progress state of the loading bar
+    useEffect(() => {
+        if (progress > 0 && progress < 100) {
+            setProgress(prev => prev + 50)
+        }
+    }, [progress, setProgress])
+    //-----------------------------------------------------****************-----------------------------------------------------\\
+
+
+    //---------------------------------- Logic to load all the user notes if user authenticated ----------------------------------\\
+
+    //UseEffect to check if the user is authenticated and load all user notes
+    useEffect(() => {
+        if (localStorage.getItem("loginToken") === null) {
+            showAlert("Please log in to access the app", "danger");// Display alert
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 500);
+        }
+        else if (localStorage.getItem("loginToken") !== null && notes.length === 0) {
+            const fetchNotes = async () => {
+                let response = null;
+                try {
+                    response = await getAllNotes();
+                    if (!response.success) {
+                        console.error(response); // Capture response errors
+                        return;
+                    }
+                }
+                catch (error) {
+                    console.error("Error fetching notes:", error.message); // Capture other than response errors
+                }
+            };
+
+            fetchNotes(); // call the async function
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    //---------------------------------------------------- ******** ----------------------------------------------------\\
+
+
+    //------------------------------------- Logic to handle drag and drop -------------------------------------\\
+
+    //
+    const [columns, setColumns] = useState({});
+
+    useEffect(() => {
+        const newColumns = { pending: [], inProgress: [], complete: [] };
+
+        notes.forEach((note) => {
+            if (note.pending) {
+                newColumns.pending.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "danger",
+                });
+            }
+            else if (note.inProgress) {
+                newColumns.inProgress.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "warning",
+                });
+            }
+            else if (note.complete) {
+                newColumns.complete.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "success",
+                });
+            }
+        });
+        setColumns(newColumns);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [notes]);
+
+    const [draggingCard, setDraggingCard] = useState(null);
+
+    const handleDragStart = (card, sourceCol) => {
+        setDraggingCard({ ...card, sourceCol });
+    };
+
+    const handleDrop = async (targetCol) => {
+        if (!draggingCard) {
+            return;
+        }
+
+        setColumns((prev) => {
+            const sourceList = [...prev[draggingCard.sourceCol]].filter(
+                (c) => c.id !== draggingCard.id
+            );
+            const targetList = [...prev[targetCol], { ...draggingCard }];
+
+            return {
+                ...prev,
+                [draggingCard.sourceCol]: sourceList,
+                [targetCol]: targetList,
+            };
+        });
+        try {
+            let noteId = draggingCard.id;
+            let updatedStatus = { pending: false, inProgress: false, complete: false };
+            updatedStatus[targetCol] = true;
+            const response = await editNoteStatus(noteId, updatedStatus);
+            // Check API response
+            if (!response.success) {
+                console.error(response); // Capture response errors
+                showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                return;
+            }
+            showAlert("Status changed successfully !", "success");// Display success alert message
+        } catch (e) {
+            console.error("Error updating notes status:", e.message); // Capture other than response errors
+            showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+        }
+
+        setDraggingCard(null);
+    };
+    //-----------------------------------------------------****************-----------------------------------------------------\\
+
+    return (
+        <div
+            className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            {Object.entries(columns).map(([colId, items]) => (
+                <div
+                    key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
+                    <div className="card h-100">
+                        <ul className="list-group list-group-flush">
+                            {items.map((item) => (
+                                <li key={item.id} className="list-group-item" draggable onDragStart={() => handleDragStart(item, colId)}>
+                                    <div
+                                        className={`card text-bg-${item.color} mb-3`} style={{ cursor: "grab" }}>
+                                        <div className="card-header">{item.noteTitle}</div>
+                                        <div className="card-body">
+                                            <p className="card-text">{item.noteDescription}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}

@@ -39,14 +39,28 @@ export default function NoteProvider(props) {
   const addNote = async (title, description, tags) => {
     // Logic to add data to the database
     try {
-      const response = await fetch(`${HOST}/api/notes/addnote`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "authToken": localStorage.getItem("loginToken")
-        },
-        body: JSON.stringify({ title, description, tags })
-      });
+      let response = null;
+      // Checks tags 
+      if (tags === "") {
+        response = await fetch(`${HOST}/api/notes/addnote`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "authToken": localStorage.getItem("loginToken")
+          },
+          body: JSON.stringify({ title, description })
+        });
+      }
+      else {
+        response = await fetch(`${HOST}/api/notes/addnote`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "authToken": localStorage.getItem("loginToken")
+          },
+          body: JSON.stringify({ title, description, tags })
+        });
+      }
       const json = await response.json();
       if (!json.success) {
         throw new Error("Failed to fetch notes from server.");
@@ -83,23 +97,36 @@ export default function NoteProvider(props) {
 
   //---------------------------------------------------------- EDIT NOTE ----------------------------------------------------------\\
   // Function to edit a note
-  const editNote = async (id, title, description, tags) => {
+  const editNote = async (id, newTitle, newDescription, newTags) => {
     // Logic to update the server side data in database    
     try {
-      const response = await fetch(`${HOST}/api/notes/updatenote/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "authToken": localStorage.getItem("loginToken")
-        },
-        body: JSON.stringify({ title, description, tags })
-      });
+      let response = null;
+      if (newTags === "") {
+        response = await fetch(`${HOST}/api/notes/updatenote/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "authToken": localStorage.getItem("loginToken")
+          },
+          body: JSON.stringify({ title: newTitle, description: newDescription })
+        });
+      }
+      else {
+        response = await fetch(`${HOST}/api/notes/updatenote/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "authToken": localStorage.getItem("loginToken")
+          },
+          body: JSON.stringify({ title: newTitle, description: newDescription, tags: newTags })
+        });
+      }
       const json = await response.json();
-      console.log(json)
       if (!json.success) {
         throw new Error("Failed to fetch notes from server.");
       }
       // Logic to update the client side data
+      const { title, description, tags } = json.editedNote;
       const updatedNotes = notes.map((note) => {
         if (note._id === id) {
           return {
@@ -121,7 +148,49 @@ export default function NoteProvider(props) {
   }
   //---------------------------------------------------------- ************ ----------------------------------------------------------\\
 
-  const value = { notes, setNotes, getAllNotes, addNote, deleteNote, editNote };
+
+  //---------------------------------------------------------- EDIT NOTE STATUS ----------------------------------------------------------\\
+  // Function to edit a note
+  const editNoteStatus = async (id, updatedFields) => {
+    // Logic to update the server side data in database    
+    try {
+      let response = null;
+      response = await fetch(`${HOST}/api/notes/updatenotestatus/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "authToken": localStorage.getItem("loginToken")
+        },
+        body: JSON.stringify({ updatedFields })
+      });
+      const json = await response.json();
+      if (!json.success) {
+        throw new Error("Failed to fetch notes from server.");
+      }
+      // Logic to update the client side data
+      const { pending, inProgress, complete } = json.editedNote;
+      const updatedNotes = notes.map((note) => {
+        if (note._id === id) {
+          return {
+            ...note, // copy existing fields (like user, timestamp, etc.)
+            pending,
+            inProgress,
+            complete
+          };
+        }
+        return note;
+      });
+      setNotes(updatedNotes); // Change the state of notes by editing the note
+      return ({ success: true });
+    }
+    catch (e) {
+      console.log(`Error: ${e.message}`)
+      return ({ success: false, error: e.message });
+    }
+  }
+  //---------------------------------------------------------- ************ ----------------------------------------------------------\\
+
+  const value = { notes, setNotes, getAllNotes, addNote, deleteNote, editNote, editNoteStatus };
 
   return <NoteContext value={value}>{props.children}</NoteContext>
 }

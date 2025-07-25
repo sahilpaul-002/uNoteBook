@@ -12,17 +12,18 @@ function App() {
   // Set the document body style
   document.body.style.backgroundColor = "#fefee3"
   document.body.style.color = "black";
+  
   return (
     <>
       <ThemeProvider>
         <AlertProvider>
           <LoadingBarProvider>
-            <Navbar />
-            <Alert />
             <NoteProvider>
+              <Navbar />
+              <Alert />
               <div className="container mb-3" style={{ minHeight: "100vh", marginTop: "3rem" }}>
-              <Outlet />
-            </div>
+                <Outlet />
+              </div>
             </NoteProvider>
             <Footer />
           </LoadingBarProvider>

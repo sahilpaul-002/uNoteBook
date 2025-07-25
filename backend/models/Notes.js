@@ -18,6 +18,18 @@ const notes = new Schema({
     type: String,
     default: "Default"
   },
+  pending: {
+    type: Boolean,
+    default: true
+  },
+  inProgress: {
+    type: Boolean,
+    default: false
+  },
+  complete: {
+    type: Boolean,
+    default: false
+  },
   timeStamp: {
     type: Date,
     default: Date.now
