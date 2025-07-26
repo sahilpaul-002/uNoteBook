@@ -83,16 +83,12 @@ export default function Navbar() {
                 <Link className={`nav-link ${location.pathname === "/" ? "active" : ""} ${isCollapsed?"":"ms-3"}`} aria-current="page" onClick={() => setProgress(prev => prev + 50)} to="/">Home</Link>
               </li>
               <li className={`nav-item ${isCollapsed?"":"mx-1"}`}>
-                <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/notestatus">Note Status</Link>
+                <Link className={`nav-link ${location.pathname === "/notestatus" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/notestatus">Note Status</Link>
               </li>
               <li className="nav-item">
                 <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} onClick={() => setProgress(prev => prev + 50)} to="/about">About</Link>
               </li>
             </ul>
-            <form className="d-flex" role="search">
-              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-              <button className="btn btn-outline-success" type="submit">Search</button>
-            </form>
 
             {/*   User details / Login / Sign up   */}
             {localStorage.getItem("loginToken") !== null ?

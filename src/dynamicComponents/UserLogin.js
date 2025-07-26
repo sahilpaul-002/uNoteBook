@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router";
 import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
+import Spinner from '../staticComponents/Spinner';
 
 export default function UserLogin() {
   const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
@@ -11,6 +12,9 @@ export default function UserLogin() {
   const { progress, setProgress } = useContext(LoadingBarContext)
 
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
+
+  // State to check  API response delivered
+  const [apiCall, setApiCall] = useState(false)
 
   //------------------------------------- Logic to show the loading by managing the state -------------------------------------\\
 
@@ -63,6 +67,7 @@ export default function UserLogin() {
     // Prevent the default functionality of reloading the page upon submit
     e.preventDefault();
     try {
+      setApiCall(true); // Change the state once API called
       // Logic to get user logged in
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
@@ -72,6 +77,7 @@ export default function UserLogin() {
         body: JSON.stringify(userLDetails)
       });
       const json = await response.json();
+      setApiCall(false); // Change the state once response is delivered
       // Check response is a success
       if (json.success) {
         // Save the auth token and redirect
@@ -145,19 +151,21 @@ export default function UserLogin() {
   //-----------------------------------------------------****************-----------------------------------------------------\\
 
   return (
-    <div className="container p-4 border border-secondary" style={{ maxWidth: "30rem", }}>
-      <form onSubmit={handleOnSubmit}>
-        <div className="mb-4">
-          <label htmlFor="email" className="form-label">Email address</label>
-          <input type="email" className="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder={`Enter your email ${animationText.emailText}`} value={userLDetails.email} required onChange={handleOnChange} />
-          <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input type="password" className="form-control" id="password" name='password' placeholder={`Enter your password ${animationText.passwordText}`} value={userLDetails.password} required onChange={handleOnChange} />
-        </div>
-        <button type="submit" className="btn btn-outline-danger my-2" disabled={disabledButton}>Submit</button>
-      </form>
-    </div>
+    apiCall ?
+      (<Spinner />) :
+      ( <div className="container p-4 border border-secondary" style={{ maxWidth: "30rem", }}>
+        <form onSubmit={handleOnSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="form-label">Email address</label>
+            <input type="email" className="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder={`Enter your email ${animationText.emailText}`} value={userLDetails.email} required onChange={handleOnChange} />
+            <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input type="password" className="form-control" id="password" name='password' placeholder={`Enter your password ${animationText.passwordText}`} value={userLDetails.password} required onChange={handleOnChange} />
+          </div>
+          <button type="submit" className="btn btn-outline-danger my-2" disabled={disabledButton}>Submit</button>
+        </form>
+      </div> )
   )
 }

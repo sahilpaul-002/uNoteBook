@@ -62,7 +62,7 @@ export default function NoteStatus() {
     // State to manage the status columns
     const [columns, setColumns] = useState({});
 
-    //
+    // State to check  API response delivered
     const [responseIn, setResponseIn] = useState(false);
 
     // UseEffect to populate columsn with the notes
@@ -111,6 +111,9 @@ export default function NoteStatus() {
         setDraggingCard({ ...card, sourceCol });
     };
 
+    // State to check  API response delivered
+    const [editApiCall, setEditApiCall] = useState(false)
+
     // Function to handle the drop
     const handleDrop = async (targetCol) => {
         if (!draggingCard) {
@@ -130,10 +133,12 @@ export default function NoteStatus() {
             };
         });
         try {
+            setEditApiCall(true);// Change the state once API called
             let noteId = draggingCard.id;
             let updatedStatus = { pending: false, inProgress: false, complete: false };
             updatedStatus[targetCol] = true;
             const response = await editNoteStatus(noteId, updatedStatus);
+            setEditApiCall(false);// Change the state once response is delivered
             // Check API response
             if (!response.success) {
                 console.error(response); // Capture response errors
@@ -155,30 +160,46 @@ export default function NoteStatus() {
             {
                 responseIn ?
                     (
-                        columns.pending.length!==0 || columns.inProgress.length!==0 || columns.complete.length!==0 ?
+                        columns.pending.length !== 0 || columns.inProgress.length !== 0 || columns.complete.length !== 0 ?
                             (
-                                <div
-                                    className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-                                    {Object.entries(columns).map(([colId, items]) => (
-                                        <div
-                                            key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
-                                            <div className="card h-100">
-                                                <ul className="list-group list-group-flush">
-                                                    {items.map((item) => (
-                                                        <li key={item.id} className="list-group-item" draggable onDragStart={() => handleDragStart(item, colId)}>
-                                                            <div
-                                                                className={`card text-bg-${item.color} mb-3`} style={{ cursor: "grab" }}>
-                                                                <div className="card-header">{item.noteTitle}</div>
-                                                                <div className="card-body">
-                                                                    <p className="card-text">{item.noteDescription}</p>
+                                <div className='position-relative'>
+                                    <div
+                                        className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                                        {Object.entries(columns).map(([colId, items]) => (
+                                            <div
+                                                key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
+                                                <div className="card h-100">
+                                                    <ul className="list-group list-group-flush">
+                                                        {items.map((item) => (
+                                                            <li key={item.id} className="list-group-item" draggable onDragStart={() => handleDragStart(item, colId)}>
+                                                                <div
+                                                                    className={`card text-bg-${item.color} mb-3`} style={{ cursor: "grab" }}>
+                                                                    <div className="card-header">{item.noteTitle}</div>
+                                                                    <div className="card-body">
+                                                                        <p className="card-text">{item.noteDescription}</p>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {editApiCall && (
+                                        <div
+                                            className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                                            style={{
+                                                backgroundColor: "rgba(255, 255, 255, 0.5)", // lighter overlay, lets cards show
+                                                backdropFilter: "blur(3px)", // adds blur to what's behind
+                                                zIndex: 10 // to keep spinner on top
+                                            }}
+                                        >
+                                            <div className="spinner-border my-5" style={{ width: "3rem", height: "3rem" }} role="status">
+                                                <span className="visually-hidden">Loading...</span>
                                             </div>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             ) :
                             (
