@@ -4,12 +4,12 @@ import NoteItem from './NoteItem'
 
 export default function Notes() {
     // Destructing context values passed from the parent
-    const {notes} = useContext(NoteContext)
+    const {notes, setNotes} = useContext(NoteContext)
     
   return (
     <div className="container mt-5 mb-3">
         <h2>Your Notes :</h2>
-        <NoteItem notes={notes}/> 
+        <NoteItem notes={notes} setNotes={setNotes}/> 
     </div>
   )
 }

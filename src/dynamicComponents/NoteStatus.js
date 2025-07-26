@@ -60,15 +60,15 @@ export default function NoteStatus() {
     //------------------------------------- Logic to handle drag and drop -------------------------------------\\
 
     // State to manage the status columns
-    const [columns, setColumns] = useState({});
+    // const [columns, setColumns] = useState({});
+    const [columns, setColumns] = useState({ pending: [], inProgress: [], complete: [] });
 
     // State to check  API response delivered
     const [responseIn, setResponseIn] = useState(false);
 
-    // UseEffect to populate columsn with the notes
+    // UseEffect to populate column with the notes
     useEffect(() => {
-
-        setTimeout(() => {
+        if (columns.pending.length === 0 || columns.inProgress.length === 0 || columns.complete.length === 0) {
             const newColumns = { pending: [], inProgress: [], complete: [] };
 
             notes.forEach((note) => {
@@ -79,16 +79,14 @@ export default function NoteStatus() {
                         noteDescription: note.description,
                         color: "danger",
                     });
-                }
-                else if (note.inProgress) {
+                } else if (note.inProgress) {
                     newColumns.inProgress.push({
                         id: note._id,
                         noteTitle: note.title,
                         noteDescription: note.description,
                         color: "warning",
                     });
-                }
-                else if (note.complete) {
+                } else if (note.complete) {
                     newColumns.complete.push({
                         id: note._id,
                         noteTitle: note.title,
@@ -97,9 +95,12 @@ export default function NoteStatus() {
                     });
                 }
             });
-            setResponseIn(true); // Change the state once the updating columns state is over
+            // Update state once done
             setColumns(newColumns);
-        }, 500)
+            setTimeout(() => {
+                setResponseIn(true);
+            }, 2500);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notes]);
 
@@ -120,11 +121,17 @@ export default function NoteStatus() {
             return;
         }
 
+        // Determine color based on the target column
+        const newColor =
+            targetCol === "pending" ? "danger" :
+                targetCol === "inProgress" ? "warning" :
+                    "success";
+
         setColumns((prev) => {
             const sourceList = [...prev[draggingCard.sourceCol]].filter(
                 (c) => c.id !== draggingCard.id
             );
-            const targetList = [...prev[targetCol], { ...draggingCard }];
+            const targetList = [...prev[targetCol], { ...draggingCard, color: newColor }];
 
             return {
                 ...prev,

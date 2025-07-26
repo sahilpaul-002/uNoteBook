@@ -7,7 +7,7 @@ import ResponseInContext from '../contexts/ResponseInContext';
 
 export default function NoteItem(props) {
     // Destructuring props from the parent 
-    const { notes } = props;
+    const { notes, setNotes } = props;
 
     // Destructing context values passed from the parent
     const { theme } = useContext(ThemeContext);
@@ -92,6 +92,23 @@ export default function NoteItem(props) {
         const updateNoteStatus = async () => {
             // Destructure the statrs state
             const { noteId, pending, inProgress, complete } = taskStatus;
+
+            // Update the notes
+            setNotes(prevNotes =>
+                prevNotes.map((note) => {
+                    if (note._id === noteId) {
+                        const updatedNote = {
+                            ...note,
+                            pending,
+                            inProgress,
+                            complete,
+                        };
+                        console.log(updatedNote); // Debug log (logs only the updated note)
+                        return updatedNote;
+                    }
+                    return note;
+                })
+            );
 
             if (noteId !== null) {
                 let response = null;

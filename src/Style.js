@@ -118,6 +118,8 @@ const outerCardStyle =(theme) => {
 //Card style for dark and light theme
 const innerCardStyle = (theme) => {
     return {
+        textAlign: "left",
+        width: "100%",
         backgroundColor: theme === "dark" ? "#343a40" : "#FFF4A4",
         color: theme === "dark" ? "white" : "black",
         border: theme === "dark" ? "1px solid grey" : ""

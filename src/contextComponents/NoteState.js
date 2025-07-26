@@ -186,7 +186,7 @@ export default function NoteProvider(props) {
     catch (e) {
       console.log(`Error: ${e.message}`)
       return ({ success: false, error: e.message });
-    }
+    } 
   }
   //---------------------------------------------------------- ************ ----------------------------------------------------------\\
 
