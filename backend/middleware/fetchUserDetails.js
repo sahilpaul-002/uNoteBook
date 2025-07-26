@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 // Load environment variables from .env.local file
 dotenv.config({ path: './.env.local' });
 const jwtSecret = process.env.JWT_SECRET
-// const jwtSecret = "uNoteSecretTokenKey"
 
 // Middleware function to fetch user details from JWT token
 const fetchUserDetails = async (req, res, next) => {

@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import fetchUserDetails from '../middleware/fetchUserDetails.js';
 
 const jwtSecret = process.env.JWT_SECRET
-// const jwtSecret = "uNoteSecretTokenKey"
 
 const router = express.Router();
 
