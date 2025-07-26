@@ -9,7 +9,7 @@ const client = connectToMongoDB();
 
 // Initialize Express app
 const app = express()
-const port = 5000
+const port = process.env.PORT || 5000
 
 // Enable cors
 app.use(cors())
