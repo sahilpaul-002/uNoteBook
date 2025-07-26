@@ -4,7 +4,7 @@ import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function UserSignUp() {
-  const HOST = "http://localhost:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
 
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
 
@@ -69,7 +69,7 @@ export default function UserSignUp() {
     try {
       const { userName, email, password } = userSDetails;
       // Logic to get user logged in
-      const response = await fetch(`${HOST}/api/auth`, {
+      const response = await fetch(`${API_BASE}/api/auth`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

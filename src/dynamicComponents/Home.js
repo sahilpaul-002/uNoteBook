@@ -51,7 +51,7 @@ export default function Home() {
               return;
             }
             setResponseIn(prev => !prev); // Set the state for checking API response delivered
-          }, 1000)
+          }, 500)
         }
         catch (error) {
           console.error("Error fetching notes:", error.message); // Capture other than response errors

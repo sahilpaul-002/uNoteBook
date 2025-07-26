@@ -4,7 +4,7 @@ import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function UserLogin() {
-  const HOST = "http://localhost:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
 
   // Destructing context values passed from the parent
   const { showAlert } = useContext(AlertContext);
@@ -64,7 +64,7 @@ export default function UserLogin() {
     e.preventDefault();
     try {
       // Logic to get user logged in
-      const response = await fetch(`${HOST}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

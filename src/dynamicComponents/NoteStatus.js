@@ -99,7 +99,7 @@ export default function NoteStatus() {
             });
             setResponseIn(true); // Change the state once the updating columns state is over
             setColumns(newColumns);
-        }, 1000)
+        }, 500)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notes]);
 

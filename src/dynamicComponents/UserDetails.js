@@ -4,7 +4,7 @@ import ThemeContext from '../contexts/ThemeContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function UserDetails() {
-    const HOST = "http://localhost:5000";
+    const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
 
     // Destructing context values passed from the parent
     const { showAlert } = useContext(AlertContext);
@@ -38,7 +38,7 @@ export default function UserDetails() {
         const getUserDetails = async () => {
             try {
                 // Logic to fetch user details
-                const response = await fetch(`${HOST}/api/auth/getuser`, {
+                const response = await fetch(`${API_BASE}/api/auth/getuser`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -113,7 +113,7 @@ export default function UserDetails() {
         try {
             const { userName, email, password } = userDetails;
             // Logic to get user logged in
-            const response = await fetch(`${HOST}/api/auth/updateuser`, {
+            const response = await fetch(`${API_BASE}/api/auth/updateuser`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

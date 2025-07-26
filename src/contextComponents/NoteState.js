@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import NoteContext from '../contexts/NoteContext'
 
 export default function NoteProvider(props) {
-  const HOST = "http://localhost:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
   const notesInitial = [];
 
   // State to manage the notes
@@ -13,7 +13,7 @@ export default function NoteProvider(props) {
   const getAllNotes = async () => {
     // Logic to fetch all notes
     try {
-      const response = await fetch(`${HOST}/api/notes/fetchallnotes`, {
+      const response = await fetch(`${API_BASE}/api/notes/fetchallnotes`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default function NoteProvider(props) {
       let response = null;
       // Checks tags 
       if (tags === "") {
-        response = await fetch(`${HOST}/api/notes/addnote`, {
+        response = await fetch(`${API_BASE}/api/notes/addnote`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function NoteProvider(props) {
         });
       }
       else {
-        response = await fetch(`${HOST}/api/notes/addnote`, {
+        response = await fetch(`${API_BASE}/api/notes/addnote`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export default function NoteProvider(props) {
   // Function to delete a note
   const deleteNote = async (id) => {
     // Logic to delete data from database
-    const response = await fetch(`${HOST}/api/notes/deletenote/${id}`, {
+    const response = await fetch(`${API_BASE}/api/notes/deletenote/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export default function NoteProvider(props) {
     try {
       let response = null;
       if (newTags === "") {
-        response = await fetch(`${HOST}/api/notes/updatenote/${id}`, {
+        response = await fetch(`${API_BASE}/api/notes/updatenote/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -112,7 +112,7 @@ export default function NoteProvider(props) {
         });
       }
       else {
-        response = await fetch(`${HOST}/api/notes/updatenote/${id}`, {
+        response = await fetch(`${API_BASE}/api/notes/updatenote/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export default function NoteProvider(props) {
     // Logic to update the server side data in database    
     try {
       let response = null;
-      response = await fetch(`${HOST}/api/notes/updatenotestatus/${id}`, {
+      response = await fetch(`${API_BASE}/api/notes/updatenotestatus/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
