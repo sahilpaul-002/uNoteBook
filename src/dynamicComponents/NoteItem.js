@@ -103,7 +103,6 @@ export default function NoteItem(props) {
                             inProgress,
                             complete,
                         };
-                        console.log(updatedNote); // Debug log (logs only the updated note)
                         return updatedNote;
                     }
                     return note;
