@@ -107,30 +107,30 @@ export default function NoteItem(props) {
             // Destructure the statrs state
             const { noteId, pending, inProgress, complete } = taskStatus;
 
-            // Update the notes
-            setNotes(prevNotes =>
-                prevNotes.map((note) => {
-                    if (note._id === noteId) {
-                        const updatedNote = {
-                            ...note,
-                            pending,
-                            inProgress,
-                            complete,
-                        };
-                        return updatedNote;
-                    }
-                    return note;
-                })
-            );
-
             if (noteId !== null) {
+                // Update the notes
+                setNotes(prevNotes =>
+                    prevNotes.map((note) => {
+                        if (note._id === noteId) {
+                            const updatedNote = {
+                                ...note,
+                                pending,
+                                inProgress,
+                                complete,
+                            };
+                            return updatedNote;
+                        }
+                        return note;
+                    })
+                );
                 let response = null;
                 try {
                     response = await editNoteStatus(noteId, { pending, inProgress, complete });
                     // Check API response
                     if (!response.success) {
                         console.error(response); // Capture response errors
-                        showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                        showAlert("Unable to edit the note status due to server issue", "danger");// Display error alert message
+                        setNotes(response.notes); // Update to the previous state of notes
                         return;
                     }
                     showAlert("Status changed successfully !", "success");// Display success alert message
@@ -143,7 +143,7 @@ export default function NoteItem(props) {
                     }, 100);
                 } catch (e) {
                     console.error("Error updating notes status:", e.message); // Capture other than response errors
-                    showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                    showAlert("Unable to edit the note status due to server issue", "danger");// Display error alert message
                 }
             }
         }

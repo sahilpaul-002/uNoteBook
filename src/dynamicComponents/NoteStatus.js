@@ -11,7 +11,7 @@ export default function NoteStatus() {
     // Destructing context values passed from the parent
     const { showAlert } = useContext(AlertContext);
     const { progress, setProgress } = useContext(LoadingBarContext)
-    const { notes, getAllNotes, editNoteStatus } = useContext(NoteContext);
+    const { notes, setNotes, getAllNotes, editNoteStatus } = useContext(NoteContext);
 
     //------------------------------------- Logic to show the loading by managing the state -------------------------------------\\
 
@@ -68,39 +68,37 @@ export default function NoteStatus() {
 
     // UseEffect to populate column with the notes
     useEffect(() => {
-        if (columns.pending.length === 0 || columns.inProgress.length === 0 || columns.complete.length === 0) {
-            const newColumns = { pending: [], inProgress: [], complete: [] };
+        const newColumns = { pending: [], inProgress: [], complete: [] };
 
-            notes.forEach((note) => {
-                if (note.pending) {
-                    newColumns.pending.push({
-                        id: note._id,
-                        noteTitle: note.title,
-                        noteDescription: note.description,
-                        color: "danger",
-                    });
-                } else if (note.inProgress) {
-                    newColumns.inProgress.push({
-                        id: note._id,
-                        noteTitle: note.title,
-                        noteDescription: note.description,
-                        color: "warning",
-                    });
-                } else if (note.complete) {
-                    newColumns.complete.push({
-                        id: note._id,
-                        noteTitle: note.title,
-                        noteDescription: note.description,
-                        color: "success",
-                    });
-                }
-            });
-            // Update state once done
-            setColumns(newColumns);
-            setTimeout(() => {
-                setResponseIn(true);
-            }, 2500);
-        }
+        notes.forEach((note) => {
+            if (note.pending) {
+                newColumns.pending.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "danger",
+                });
+            } else if (note.inProgress) {
+                newColumns.inProgress.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "warning",
+                });
+            } else if (note.complete) {
+                newColumns.complete.push({
+                    id: note._id,
+                    noteTitle: note.title,
+                    noteDescription: note.description,
+                    color: "success",
+                });
+            }
+        });
+        // Update state once done
+        setColumns(newColumns);
+        setTimeout(() => {
+            setResponseIn(true);
+        }, 2500);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [notes]);
 
@@ -116,7 +114,7 @@ export default function NoteStatus() {
     const [editApiCall, setEditApiCall] = useState(false)
 
     // Function to handle the drop
-    const handleDrop = async (targetCol) => {
+    const handleDrop = async (targetCol, itemId) => {
         if (!draggingCard) {
             return;
         }
@@ -126,7 +124,7 @@ export default function NoteStatus() {
             targetCol === "pending" ? "danger" :
                 targetCol === "inProgress" ? "warning" :
                     "success";
-
+        // Update the columns
         setColumns((prev) => {
             const sourceList = [...prev[draggingCard.sourceCol]].filter(
                 (c) => c.id !== draggingCard.id
@@ -139,6 +137,19 @@ export default function NoteStatus() {
                 [targetCol]: targetList,
             };
         });
+        // Update the notes
+        setNotes(prevNotes =>
+            prevNotes.map((note) => {
+                if (note._id === itemId) {
+                    const updatedNote = {
+                        ...note,
+                        [targetCol]: true
+                    };
+                    return updatedNote;
+                }
+                return note;
+            })
+        );
         try {
             setEditApiCall(true);// Change the state once API called
             let noteId = draggingCard.id;
@@ -149,13 +160,14 @@ export default function NoteStatus() {
             // Check API response
             if (!response.success) {
                 console.error(response); // Capture response errors
-                showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+                showAlert("Unable to edit the note status due to server issue", "danger");// Display error alert message
+                setNotes(response.notes) // Update back to the previous state os notes
                 return;
             }
             showAlert("Status changed successfully !", "success");// Display success alert message
         } catch (e) {
             console.error("Error updating notes status:", e.message); // Capture other than response errors
-            showAlert("Unable to edit the note due to server issue", "danger");// Display error alert message
+            showAlert("Unable to edit the note status due to server issue", "danger");// Display error alert message
         }
 
         setDraggingCard(null);
@@ -174,7 +186,7 @@ export default function NoteStatus() {
                                         className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
                                         {Object.entries(columns).map(([colId, items]) => (
                                             <div
-                                                key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId)}>
+                                                key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId, items.id)}>
                                                 <div className="card h-100">
                                                     <ul className="list-group list-group-flush">
                                                         {items.map((item) => (

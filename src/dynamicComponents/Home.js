@@ -48,6 +48,7 @@ export default function Home() {
             response = await getAllNotes();
             if (!response.success) {
               console.error(response); // Capture response errors
+              setResponseIn(prev => !prev); // Set the state for checking API response delivered
               return;
             }
             setResponseIn(prev => !prev); // Set the state for checking API response delivered
@@ -55,6 +56,7 @@ export default function Home() {
         }
         catch (error) {
           console.error("Error fetching notes:", error.message); // Capture other than response errors
+          setResponseIn(prev => !prev); // Set the state for checking API response delivered
         }
       };
 

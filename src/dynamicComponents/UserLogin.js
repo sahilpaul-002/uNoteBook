@@ -5,7 +5,7 @@ import LoadingBarContext from '../contexts/LoadingBarContext';
 import Spinner from '../staticComponents/Spinner';
 
 export default function UserLogin() {
-  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   // Destructing context values passed from the parent
   const { showAlert } = useContext(AlertContext);

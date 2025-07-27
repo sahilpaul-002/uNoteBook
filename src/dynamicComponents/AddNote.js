@@ -152,7 +152,6 @@ export default function AddNote() {
               displayText += text[i];
               setanimationText(prev => ({ ...prev, [type]: displayText }));
             }
-            // console.log(displayText);
             i++;
           } else {
             clearInterval(intervalId);

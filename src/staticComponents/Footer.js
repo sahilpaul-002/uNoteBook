@@ -8,15 +8,15 @@ export default function Footer() {
     return (
         <div className={`card mt-5 pt-2 ${theme==="light"?"bg-warning-subtle":"bg-black"}`} style={{...(theme==="light"?{color: "black"}:{color: "white"})}}>
             <div className="card-header text-center fw-bold">
-                Stay Informed. Stay Ahead.
+                Organize. Focus. Achieve.
             </div>
             <div className="card-body">
                 <figure className="text-center">
                     <blockquote className="blockquote">
-                        <p>"In a world of noise, facts matter. Trust NewsScope for accurate, timely, and curated headlines."</p>
+                        <p>"Your thoughts, plans, and ideas — all in one place. Stay productive with uNoteBook."</p>
                     </blockquote>
                     <figcaption className="blockquote-footer">
-                        Brought to you by <cite title="NewsScope Team">NewsScope Team</cite>
+                        Brought to you by <cite title="NewsScope Team">uNoteBook Team</cite>
                     </figcaption>
                 </figure>
             </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import NoteContext from '../contexts/NoteContext'
 
 export default function NoteProvider(props) {
-  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
   const notesInitial = [];
 
   // State to manage the notes
@@ -174,7 +174,7 @@ export default function NoteProvider(props) {
       });
       const json = await response.json();
       if (!json.success) {
-        throw new Error("Failed to fetch notes from server.");
+        throw new Error("Failed to edit notes status from server.");
       }
       // Logic to update the client side data
       const { pending, inProgress, complete } = json.editedNote;
@@ -194,7 +194,7 @@ export default function NoteProvider(props) {
     }
     catch (e) {
       console.error(`Error: ${e.message}`)
-      return ({ success: false, error: e.message });
+      return ({ success: false, error: e.message, notes: notes });
     }
   }
   //---------------------------------------------------------- ************ ----------------------------------------------------------\\

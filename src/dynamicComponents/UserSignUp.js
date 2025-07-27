@@ -4,7 +4,7 @@ import AlertContext from '../contexts/AlertContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function UserSignUp() {
-  const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const navigate = useNavigate(); //Instantiate the useNavigate hook from react router
 
@@ -81,7 +81,6 @@ export default function UserSignUp() {
       if (json.success) {
         // Save the auth token and redirect
         localStorage.setItem('signupToken', json.authToken);
-        // console.log(localStorage)
         navigate("/login");// After successfull signup and token storing redirect the user to the login page
         showAlert("Sign up successful", "success"); // Display alert
       }
@@ -128,7 +127,6 @@ export default function UserSignUp() {
               displayText += text[i];
               setanimationText(prev => ({ ...prev, [type]: displayText }));
             }
-            // console.log(displayText);
             i++;
           } else {
             clearInterval(intervalId);

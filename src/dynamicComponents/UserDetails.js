@@ -4,7 +4,7 @@ import ThemeContext from '../contexts/ThemeContext';
 import LoadingBarContext from '../contexts/LoadingBarContext';
 
 export default function UserDetails() {
-    const API_BASE = process.env.REACT_APP_API_URL || "http://localAPI_BASE:5000";
+    const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
     // Destructing context values passed from the parent
     const { showAlert } = useContext(AlertContext);
@@ -47,7 +47,7 @@ export default function UserDetails() {
                 });
                 const json = await response.json();
                 if (!json.success) {
-                    console.log(json);
+                    console.error(json);
                     showAlert("Unable fetch your detils right now. Sorry!", "danger");// Display error alert message
                     return;
                 }
@@ -184,7 +184,6 @@ export default function UserDetails() {
                             displayText += text[i];
                             setanimationText(prev => ({ ...prev, [type]: displayText }));
                         }
-                        // console.log(displayText);
                         i++;
                     } else {
                         clearInterval(intervalId);
