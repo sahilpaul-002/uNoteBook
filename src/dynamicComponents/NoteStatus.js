@@ -13,11 +13,6 @@ export default function NoteStatus() {
     const { progress, setProgress } = useContext(LoadingBarContext)
     const { notes, setNotes, getAllNotes, editNoteStatus } = useContext(NoteContext);
 
-    // Scroll to the top of the page
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 500);
-
     //------------------------------------- Logic to show the loading by managing the state -------------------------------------\\
 
     // UseEffect to manage the progress state of the loading bar
@@ -33,6 +28,9 @@ export default function NoteStatus() {
 
     //UseEffect to check if the user is authenticated and load all user notes
     useEffect(() => {
+        // Scroll to the top of the page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         if (localStorage.getItem("loginToken") === null) {
             showAlert("Please log in to access the app", "danger");// Display alert
 
