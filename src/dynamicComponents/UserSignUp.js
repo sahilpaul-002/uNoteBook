@@ -61,11 +61,15 @@ export default function UserSignUp() {
 
   //------------------------------------- Logic to handle submission of form  -------------------------------------\\
 
+  // State to check  API response delivered
+  const [apiCall, setApiCall] = useState(false)
+
   // Function to handle on form submit
   const handleOnSubmit = async (e) => {
     // Prevent the default functionality of reloading the page upon submit
     e.preventDefault();
 
+    setApiCall(true);// Change the state once API called
     try {
       const { userName, email, password } = userSDetails;
       // Logic to get user logged in
@@ -76,6 +80,7 @@ export default function UserSignUp() {
         },
         body: JSON.stringify({ name: userName, email, password })
       });
+      setApiCall(false);// Change the state once response is delivered
       const json = await response.json();
       // Check response is a success
       if (json.success) {
@@ -169,8 +174,17 @@ export default function UserSignUp() {
         <div className="mb-4">
           <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
           <input type="password" className="form-control" id="confirmPassword" name='confirmPassword' placeholder={`Re-enter your password ${animationText.passwordText}`} value={userSDetails.confirmPassword} required onChange={handleOnChange} />
-        </div>
-        <button type="submit" className="btn btn-outline-danger my-2" disabled={disabledButton}>Submit</button>
+        </div >
+        <button type="submit" className="btn btn-outline-danger my-2 d-flex align-items-center gap-2" disabled={disabledButton}>
+          Submit
+          {apiCall && (
+            <div className="d-flex justify-content-center">
+              <div className="spinner-border spinner-border-sm" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          )}
+        </button>
       </form>
     </div>
   )

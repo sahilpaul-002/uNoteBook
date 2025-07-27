@@ -8,7 +8,7 @@ export default function Alert() {
 
     return (
       // <div>Alert</div>
-        <div style={{ height: "15px", marginTop: "55px" }}>
+        <div className="fixed-top" style={{ height: "7px", marginTop: "55px" }}>
             {alert && <div className={`alert alert-${alert===null?'danger':alert.type} alert-dismissible fade show`} role="alert">
                 <strong>{alert === null || alert.type==="danger"? 'Error' : capitalize(alert.type)} : </strong> {alert===null?'Please ignore this alert':alert.msg}
                 <button type="button" className="btn-close" aria-label="Close" onClick={dismissAlert}></button>

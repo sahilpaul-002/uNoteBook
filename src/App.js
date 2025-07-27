@@ -21,7 +21,7 @@ function App() {
             <NoteProvider>
               <Navbar />
               <Alert />
-              <div className="container mb-3" style={{ minHeight: "100vh", marginTop: "3rem" }}>
+              <div className="container mb-3" style={{ minHeight: "100vh", marginTop: "7rem" }}>
                 <Outlet />
               </div>
             </NoteProvider>

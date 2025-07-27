@@ -177,7 +177,7 @@ export default function AddNote() {
   //------------------------------------- ************************************* -------------------------------------||
 
   return (
-    <div className="container mb-5">
+    <div className="container">
       <div className="container mb-3">
         <h1 className='d-flex justify-content-center mb-0'><u>uNoteBook</u></h1>
         <p className='d-flex justify-content-center '>Personal Notes App On Your Finger Tips</p>

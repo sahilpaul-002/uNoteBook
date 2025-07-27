@@ -13,6 +13,11 @@ export default function NoteStatus() {
     const { progress, setProgress } = useContext(LoadingBarContext)
     const { notes, setNotes, getAllNotes, editNoteStatus } = useContext(NoteContext);
 
+    // Scroll to the top of the page
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 500);
+
     //------------------------------------- Logic to show the loading by managing the state -------------------------------------\\
 
     // UseEffect to manage the progress state of the loading bar
@@ -183,7 +188,7 @@ export default function NoteStatus() {
                             (
                                 <div className='position-relative'>
                                     <div
-                                        className="row row-cols-1 row-cols-md-3 g-4" style={{ flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                                        className="row row-cols-1 row-cols-md-3 g-4 mb-3" style={{ marginTop: "1px", flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
                                         {Object.entries(columns).map(([colId, items]) => (
                                             <div
                                                 key={colId} className="col" style={{ flex: "0 0 auto", minWidth: "250px" }} onDragOver={(e) => e.preventDefault()} onDrop={() => handleDrop(colId, items.id)}>
