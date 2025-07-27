@@ -35,11 +35,25 @@ export default function NoteItem(props) {
     //---------------------------------- Logic to handle the on click event of the delete button ----------------------------------\\
 
     // Function to manage event on delete
-    const handleOnDelete = () => {
-        // Scroll to the top of the page
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        showAlert("Note deleted successfully !", "success");// Display alert message
+    const handleOnDelete = async (noteId) => {
+        let response = null;
+        try {
+            response = await deleteNote(noteId);
+            if (!response.success) {
+                console.error(response); // Capture response errors
+                showAlert("Unable to delete the note due to server issue", "danger");// Display error alert message
+                return;
+            }
+            // Scroll to the top of the page
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
+            showAlert("Note deleted successfully !", "success");// Display alert message
+        }
+        catch (e) {
+            console.error("Error editing notes:", e.message); // Capture other than response errors
+            showAlert("Unable to delete the note due to server issue", "danger");// Display error alert message
+        }
     }
     //---------------------------------------------------- ******** ----------------------------------------------------\\
 
@@ -169,7 +183,7 @@ export default function NoteItem(props) {
                                                 }
                                             </div>
                                             <i className="fa-solid fa-file-pen mx-2" onClick={() => { handleOnClick(note) }}></i>
-                                            <i className="fa-solid fa-trash mx-2" onClick={() => { deleteNote(note._id); handleOnDelete() }}></i>
+                                            <i className="fa-solid fa-trash mx-2" onClick={() => { handleOnDelete(note._id) }}></i>
                                         </div>
                                     </div>
                                 )

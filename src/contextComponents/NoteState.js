@@ -69,7 +69,7 @@ export default function NoteProvider(props) {
       return ({ success: true });
     }
     catch (e) {
-      console.log(`Error: ${e.message}`)
+      console.error(`Error: ${e.message}`)
       return ({ success: false, error: e.message });
     }
   }
@@ -80,17 +80,26 @@ export default function NoteProvider(props) {
   // Function to delete a note
   const deleteNote = async (id) => {
     // Logic to delete data from database
-    const response = await fetch(`${API_BASE}/api/notes/deletenote/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "authToken": localStorage.getItem("loginToken")
+    try {
+      const response = await fetch(`${API_BASE}/api/notes/deletenote/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "authToken": localStorage.getItem("loginToken")
+        }
+      });
+      const json = await response.json();
+      if (!json.success) {
+        throw new Error("Failed to delete notes from server.");
       }
-    });
-    const json = await response.json();
-    console.log(json);
-    let newNotes = notes.filter((note) => { return note._id !== id });
-    setNotes(newNotes);
+      let newNotes = notes.filter((note) => { return note._id !== id });
+      setNotes(newNotes);
+      return ({ success: true });
+    }
+    catch (e) {
+      console.error(`Error: ${e.message}`)
+      return ({ success: false, error: e.message });
+    }
   }
   //---------------------------------------------------------- ************ ----------------------------------------------------------\\
 
@@ -142,7 +151,7 @@ export default function NoteProvider(props) {
       return ({ success: true });
     }
     catch (e) {
-      console.log(`Error: ${e.message}`)
+      console.error(`Error: ${e.message}`)
       return ({ success: false, error: e.message });
     }
   }
@@ -184,9 +193,9 @@ export default function NoteProvider(props) {
       return ({ success: true });
     }
     catch (e) {
-      console.log(`Error: ${e.message}`)
+      console.error(`Error: ${e.message}`)
       return ({ success: false, error: e.message });
-    } 
+    }
   }
   //---------------------------------------------------------- ************ ----------------------------------------------------------\\
 

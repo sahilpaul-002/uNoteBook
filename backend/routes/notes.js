@@ -138,6 +138,7 @@ router.put('/updatenote/:id', fetchUserDetails,
 // Route 4 : Delete  an existing note for a user using DELETE "/api/notes/deletenote/:id" - Login required
 router.delete('/deletenote/:id', fetchUserDetails,
     async (req, res) => {
+        let success = false;
         try {
             // Check user is logged in
             if (!req.user) {
@@ -147,24 +148,24 @@ router.delete('/deletenote/:id', fetchUserDetails,
             const noteId = req.params.id;
             const note = await Note.findById(noteId);
             if (!note) {
-                return res.status(404).json({error: "Not found"});
+                return res.status(404).json({success:false, error: "Not found"});
             }
             // Check if the note belongs to the user
             if (note.user.toString() !== req.user.userId) {
-                return res.status(401).json({error: "Not allowed to delete this note"});
+                return res.status(401).json({success:false, error: "Not allowed to delete this note"});
             }
             // Delete the note in the database
             const deletedNote = await Note.findByIdAndDelete(noteId);
             // Send the created note in the response
-            res.json({ success: "Note deleted successfully", note: deletedNote });
+            res.json({ success:true, message: "Note deleted successfully", note: deletedNote });
 
         } catch (e) {
             // If the validation errors is array
             if (e.array) {
-                return res.status(500).json({ errors: e.array() });
+                return res.status(500).json({ success: false, errors: e.array() });
             }
             // If it's some other error (e.g. DB error)
-            return res.status(500).json({ error: e.message });
+            return res.status(500).json({ success: false, error: e.message });
         }
 
     });
